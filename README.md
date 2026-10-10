@@ -1,22 +1,22 @@
-# ✈️ TravelConcierge AI
+# TravelConcierge AI
 > **Autonomous Multi-Agent Travel Architecture** — Orchestrating specialized AI concierges to research, optimize, and build bespoke, interactive travel itineraries in real-time.
 
 ---
 
-## 🌟 Overview
+## Overview
 
 **TravelConcierge AI** is a production-grade multi-agent travel planning platform powered by **CrewAI**, **FastAPI**, and **React (Vite)**. Instead of generating generic, single-prompt travel lists, the system deploys a coordinated crew of specialized AI agents running parallel deep research, spatial blueprints, budget validation, and real-time live execution streaming.
 
 ---
 
-## 🤖 Multi-Agent Architecture
+## Multi-Agent Architecture
 
 ```
                                 [ User Preferences ]
                                          │
                                          ▼
                            ┌───────────────────────────┐
-                           │   Lead Spatial Architect  │
+                           │  Spatial Architect Agent  │
                            │  (Geographic Blueprint)   │
                            └─────────────┬─────────────┘
                                          │
@@ -24,7 +24,7 @@
                  │                       │                       │
                  ▼                       ▼                       ▼
       ┌─────────────────────┐ ┌─────────────────────┐ ┌─────────────────────┐
-      │   Accommodations    │ │    Experiences      │ │   Dining & Food     │
+      │Accommodations Agent │ │  Experiences Agent  │ │    Dining Agent     │
       │ (Hotels & Districts)│ │ (Culture & Rhythm)  │ │ (Local Gastronomy)  │
       └──────────┬──────────┘ └──────────┬──────────┘ └──────────┬──────────┘
                  │                       │                       │
@@ -32,45 +32,44 @@
                                          │
                                          ▼
                               ┌─────────────────────┐
-                              │  Mobility & Transit │
+                              │Mobility&TransitAgent│
                               │ (Transfers & Passes)│
                               └──────────┬──────────┘
                                          │
                                          ▼
                               ┌─────────────────────┐
-                              │   Budget & Finance  │
+                              │Budget &Finance Agent│
                               │(Cost Audit & Safety)│
                               └──────────┬──────────┘
                                          │
                                          ▼
                               ┌─────────────────────┐
                               │ Itinerary Synthesis │
-                              │(Final JSON Structure)│
+                              │        Agent        │
                               └─────────────────────┘
 ```
 
 ### Specialist Roles:
-1. **Lead Spatial Architect** *(Background Engine)*: Analyzes geographic hubs, optimal clusters, and pacing to prevent zigzag travel.
-2. **Accommodations Specialist**: Discovers handpicked boutique hotels, district values, neighborhood safety, and walkability.
-3. **Experiences & Culture Specialist**: Curates timed activities, cultural landmarks, hidden gems, and seasonal weather adaptations.
-4. **Dining & Culinary Specialist**: Researches authentic culinary hotspots, signature dishes, street food markets, and dietary-tailored restaurants.
-5. **Mobility & Transit Specialist**: Calculates airport transfers, rail passes, transit durations, and daily point-to-point logistics.
-6. **Budget & Finance Specialist**: Audits total costs across categories, checks exchange rates, and prevents budget overruns.
+1. **Spatial Architect Agent** *(Background Engine)*: Analyzes geographic hubs, optimal clusters, and pacing to prevent zigzag travel.
+2. **Accommodations Agent**: Discovers handpicked boutique hotels, district values, neighborhood safety, and walkability.
+3. **Experiences & Culture Agent**: Curates timed activities, cultural landmarks, hidden gems, and seasonal weather adaptations.
+4. **Dining & Culinary Agent**: Researches authentic culinary hotspots, signature dishes, street food markets, and dietary-tailored restaurants.
+5. **Mobility & Transit Agent**: Calculates airport transfers, rail passes, transit durations, and daily point-to-point logistics.
+6. **Budget & Finance Agent**: Audits total costs across categories, checks exchange rates, and prevents budget overruns.
 7. **Itinerary Synthesis Agent**: Assembles all dossiers into a validated, day-by-day itinerary with exact coordinates and map links.
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
-- **⚡ Parallel Agent Execution**: Specialized agents run simultaneously for rapid multi-domain reconnaissance.
-- **📡 Live SSE Trace Streaming**: Watch the agents research, call tools, and communicate in real-time via Server-Sent Events.
-- **🔍 Grounded Real-Time Tools**: Integrated Serper web search, live destination weather lookups, currency conversion, and transit estimators.
-- **🎨 Glassmorphic Modern Frontend**: Dark-mode UI built with React, Lucide Icons, interactive day tabs, and Google Maps integration.
-- **💻 CLI & Web Interfaces**: Run full itinerary synthesis straight from the terminal or through the web application.
+- **Parallel Agent Execution**: Specialized agents run simultaneously for rapid multi-domain reconnaissance.
+- **Live SSE Trace Streaming**: Watch the agents research, call tools, and communicate in real-time via Server-Sent Events.
+- **Grounded Real-Time Tools**: Integrated Serper web search, live destination weather lookups, currency conversion, and transit estimators.
+- **Glassmorphic Modern Frontend**: Dark-mode UI built with React, Lucide Icons, interactive day tabs, and Google Maps integration.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Backend**: Python 3.11+, FastAPI, Uvicorn, CrewAI, LiteLLM, Pydantic v2
 - **LLM Engine**: Groq (Qwen / Llama models), OpenRouter, NVIDIA NIM
@@ -79,7 +78,7 @@
 
 ---
 
-## 📋 Getting Started
+## Getting Started
 
 ### 1. Prerequisites
 - **Python 3.10+**
@@ -161,7 +160,7 @@ The output is automatically saved to `output_itinerary.json`.
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 ai_travel_concierge/
@@ -195,6 +194,6 @@ ai_travel_concierge/
 
 ---
 
-## 📜 License
+## License
 
 This project is open source and available under the [MIT License](LICENSE).
