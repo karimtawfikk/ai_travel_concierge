@@ -1,0 +1,125 @@
+# =============================================================================
+# AI TRAVEL CONCIERGE - TASKS CONFIGURATION
+# =============================================================================
+
+trip_blueprint_task:
+  description: >
+    Analyze {destination} for a {duration_days}-day trip tailored to {travel_style}, {interests}, and {pace}.
+    Establish a high-level spatial blueprint for the journey:
+    1. Identify 1-2 strategic central base neighborhoods to anchor the traveler's lodging.
+    2. Assign a distinct geographic district anchor and theme for each day of the {duration_days}-day trip so that daily activities and dining cluster together seamlessly without cross-city transit friction.
+    Do NOT recommend specific hotel properties, restaurants, or ticket prices—focus purely on establishing the spatial framework for your specialist team.
+  expected_output: >
+    A structured spatial blueprint conforming to TripSpatialBlueprint with recommended base neighborhoods and day-by-day district anchors.
+
+stay_scout_task:
+  description: >
+    Review the Lead Architect's spatial blueprint for {destination} ({duration_days} days).
+    Recommend accommodation options located within or convenient to the Architect's designated base neighborhoods,
+    taking into account the traveler's {travel_style}, budget of {budget} {currency}, and {interests}.
+    Choose a minimum of 3 places; prioritize fit and credible detail over filling a quota.
+    Consider conventional full-service and chain hotels alongside independent hotels, boutique properties,
+    and other lodging types.
+    Serper search is available when you need to discover real properties or check current details;
+    include {current_year} in a search query when it helps find up-to-date information.
+    Do not search just to satisfy a prompt. If you use search, distinguish sourced facts from estimates
+    and include the supporting links. Do not invent a property, address, or current price.
+  expected_output: >
+    A concise set of suitable neighborhoods and named stay recommendations, identifying each property's
+    type (for example, hotel, boutique hotel, or hostel), with rationale, price estimates where available,
+    and source links for externally verified claims.
+  async_execution: true
+
+activity_planning_task:
+  description: >
+    Review the Lead Architect's spatial blueprint for {destination} ({duration_days} days).
+    Plan experiences shaped by {interests}, {travel_style}, and {pace}, anchoring each day's activities
+    to that day's designated district/neighborhood focus from the blueprint.
+    Build a realistic day-by-day rhythm and choose activities that fit proximity to prevent transit exhaustion.
+    Note that the Dining Agent will search for food within your designated daily district.
+    estimate_transit_and_distance is available to verify travel times and distances between consecutive morning and afternoon activities.
+    Serper search is available if you need to discover or verify a place or current visitor details;
+    include {current_year} in a query when it helps find current information.
+    get_destination_weather is available for current and near-term conditions. Use it when relevant. If dates are beyond
+    the immediate forecast window, provide the destination's typical seasonal climate, realistic expected temperature
+    range (e.g. '18°C - 28°C'), and general sky/rain conditions concisely without writing disclaimers about unavailable forecasts.
+  expected_output: >
+    A realistic, day-by-day activity plan with time blocks, concise descriptions, and source links for
+    any externally researched claims.
+  async_execution: true
+
+food_scout_task:
+  description: >
+    Review the Lead Architect's spatial blueprint for {destination} ({duration_days} days).
+    Coordinate directly with the daily activity schedule by scouting dining options (breakfast, lunch, dinner, cafe)
+    located inside each day's designated district anchor so travelers eat near their activities.
+    Respect {dietary_preferences}, budget, and the traveler's preferred style. Favor distinctive local food.
+    estimate_transit_and_distance is available to verify walking or taxi distance from the daily activity cluster to dining spots.
+    Serper search is available when you need to discover real restaurants or verify current details;
+    include {current_year} in a query when it helps find current information.
+    Use it when helpful; do not call it just to satisfy a prompt. Never invent a restaurant, address,
+    opening status, or current price. Mark uncertain prices as estimates and provide source links for
+    claims supported by search.
+  expected_output: >
+    A concise selection of named dining options with meal type, cuisine, rationale, approximate price
+    level, and source links for researched claims.
+  async_execution: true
+
+transit_scout_task:
+  description: >
+    Review the Lead Architect's spatial blueprint for {destination} ({duration_days} days).
+    Coordinate with the Accommodations and Activity plans by mapping out practical transportation routes,
+    airport-to-base transfers, and daily travel between the designated base neighborhood and daily district anchors.
+    Use estimate_transit_and_distance to calculate realistic travel times, walking distances, and taxi/transit recommendations between key hubs.
+    Focus on useful routes, payment/pass choices, realistic time and fare estimates, and trade-offs; avoid generic filler.
+    Serper search is available when current fares, routes, service details, or pass rules need checking;
+    include {current_year} in a query when it helps find current information.
+    Use it when the information matters and include source links; clearly label estimates and never invent current prices.
+  expected_output: >
+    A practical arrival guide and concise mobility advice, with estimates clearly labeled and source
+    links for externally verified details.
+  async_execution: true
+
+budget_analysis_task:
+  description: >
+    Estimate lodging, food, activities, and local transport costs for {destination} over
+    {duration_days} days. Use the specialist findings, traveler budget {budget} {currency}, and
+    destination currency {destination_currency}. Present each cost category and the grand total in
+    {destination_currency} first, followed by its approximate equivalent in the user's currency
+    ({currency}) when different. Keep assumptions clear and distinguish researched prices from estimates.
+    When the currencies differ and {budget} is numeric, use convert_currency with the actual traveler
+    budget to obtain a reference exchange rate and convert that budget to {destination_currency} for
+    the within-budget comparison. Use that same returned rate consistently to calculate the user-currency
+    equivalents of the local cost estimates. Do not use an arbitrary sample amount or invent a rate.
+    Skip conversion when currencies match. If the budget is not numeric or conversion fails, still report
+    researched/estimated costs in {destination_currency}, mark equivalents as unavailable, and do not
+    guess. Set the budget currency field to {destination_currency}.
+    IMPORTANT: Format each itemized subtotal (lodging, dining, activities, transit, grand total) as a clean, concise price range (e.g. '€450 - €600 (~$490 - $650)' or '3,200 EGP (~$65)'). Do NOT write long math formulas, itemized adult/child multiplication formulas, or rate derivation essays inside the total price strings.
+  expected_output: >
+    An itemized estimate with destination-currency amounts and, when currencies differ, user-currency
+    equivalents for lodging, food, activities, transit, and grand total; a comparison with the stated
+    budget; concise assumptions; and practical savings advice. Clearly label reference-rate equivalents.
+
+itinerary_compilation_task:
+  description: >
+    Synthesize the specialist findings into a coherent itinerary for {destination}, lasting
+    {duration_days} days and reflecting {travel_style}, {interests}, {pace}, and {dietary_preferences}.
+    Use the research as evidence, resolve conflicts sensibly, and call out important gaps or uncertainty
+    rather than making up facts. Adapt the amount of detail and number of recommendations to the trip;
+    there are no fixed activity, stay, or dining quotas. Keep the result concise enough to complete the
+    structured output.
+    Organize each day into a natural timeline, combine the specialists' advice on stays, dining,
+    transport, weather, and budget, and avoid repeating recommendations unnecessarily. Coordinate
+    activities and dining geographically: group each day's activities into a nearby area or cluster,
+    pair meals with places in or near that same cluster, and use a different area on another day when
+    that makes the trip more practical. Use the place names and neighborhoods in the research; do not
+    infer precise distances when the location evidence is unclear. Use specific
+    place names and neighborhoods so the application can create Google Maps search links; do not invent
+    coordinates or URLs. Format the airport guide and general mobility advice as short numbered points,
+    each on its own line.
+    For the weather advisory field: Always provide a concise, realistic expected temperature range (e.g. '18°C - 28°C (64°F - 82°F)') and condition summary (e.g. 'Warm and sunny with light breeze; cool evenings') based on seasonal climate or live research. NEVER output meta-disclaimers or commentary like 'No date-specific forecast was available' or 'The research did not include a forecast'.
+    For the budget fields (lodging_total, food_total, activities_total, transit_total, grand_total): Format each STRICTLY as a clean, concise price range with currency codes (e.g. '€450 - €600 (~$490 - $650)' or '3,200 EGP (~$65)'). NEVER put mathematical calculation steps, multiplication formulas, exchange rate derivations, or parenthetical essays into these fields.
+  expected_output: >
+    One structured result matching CompleteTripItinerary. Populate required fields, use empty arrays
+    when research does not support a recommendation, label estimates, and do not wrap the result in
+    Markdown or a code fence.
