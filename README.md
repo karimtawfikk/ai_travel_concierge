@@ -12,35 +12,29 @@
 ## Multi-Agent Architecture
 
 ```
-                                [ User Preferences ]
-                                         │
-                 ┌───────────────────────┼───────────────────────┐
-                 │ (Parallel Execution)  │ (Parallel Execution)  │ (Parallel Execution)
-                 ▼                       ▼                       ▼
-      ┌─────────────────────┐ ┌─────────────────────┐ ┌─────────────────────┐
-      │Accommodations Agent │ │  Experiences Agent  │ │    Dining Agent     │
-      │ (Hotels & Districts)│ │ (Culture & Rhythm)  │ │ (Local Gastronomy)  │
-      └──────────┬──────────┘ └──────────┬──────────┘ └──────────┬──────────┘
-                 │                       │                       │
-                 └───────────────────────┼───────────────────────┘
-                                         │
-                                         ▼
-                              ┌─────────────────────┐
-                              │Mobility&TransitAgent│
-                              │ (Transfers & Passes)│
-                              └──────────┬──────────┘
-                                         │
-                                         ▼
-                              ┌─────────────────────┐
-                              │Budget &Finance Agent│
-                              │(Cost Audit & Safety)│
-                              └──────────┬──────────┘
-                                         │
-                                         ▼
-                              ┌─────────────────────┐
-                              │ Itinerary Synthesis │
-                              │        Agent        │
-                              └─────────────────────┘
+                                      [ User Preferences ]
+                                               │
+                 ┌─────────────────────────────┼─────────────────────────────┬─────────────────────────────┐
+                 │ (Parallel Execution)        │ (Parallel Execution)        │ (Parallel Execution)        │ (Parallel Execution)
+                 ▼                             ▼                             ▼                             ▼
+      ┌─────────────────────┐       ┌─────────────────────┐       ┌─────────────────────┐       ┌─────────────────────┐
+      │Accommodations Agent │       │  Experiences Agent  │       │    Dining Agent     │       │Mobility&TransitAgent│
+      │ (Hotels & Districts)│       │ (Culture & Rhythm)  │       │ (Local Gastronomy)  │       │ (Transfers & Passes)│
+      └──────────┬──────────┘       └──────────┬──────────┘       └──────────┬──────────┘       └──────────┬──────────┘
+                 │                             │                             │                             │
+                 └─────────────────────────────┼─────────────────────────────┴─────────────────────────────┘
+                                               │
+                                               ▼
+                                    ┌─────────────────────┐
+                                    │Budget &Finance Agent│
+                                    │(Cost Audit & Safety)│
+                                    └──────────┬──────────┘
+                                               │
+                                               ▼
+                                    ┌─────────────────────┐
+                                    │ Itinerary Synthesis │
+                                    │        Agent        │
+                                    └─────────────────────┘
 ```
 
 ### Specialist Roles:
@@ -103,17 +97,7 @@
    pip install -r requirements.txt
    ```
 
-4. **Configure environment variables**:
-   Copy `.env.example` to `.env` and fill in your API keys:
-   ```bash
-   cp .env.example .env
-   ```
-   ```ini
-   GROQ_API_KEY1=gsk_...
-   SERPER_API_KEY=your_serper_key
-   ```
-
-5. **Start the FastAPI backend server**:
+4. **Start the FastAPI backend server**:
    ```bash
    python -m uvicorn src.server:app --reload --port 8000
    ```
