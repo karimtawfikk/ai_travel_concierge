@@ -140,8 +140,7 @@ The output is automatically saved to `output_itinerary.json`.
 ## Project Structure
 
 ```
-ai_travel_concierge/
-├── .env.example              # Environment variables template
+ai_travel_concierge/             
 ├── .gitignore                # Git ignore configuration
 ├── requirements.txt          # Python dependencies
 ├── run_cli.py                # Command-line execution entry point
