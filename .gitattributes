@@ -1,0 +1,3 @@
+# Force GitHub Linguist to treat frontend as vendored/bundled so Python is the primary language in repo statistics
+frontend/** linguist-vendored
+package-lock.json linguist-generated
