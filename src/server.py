@@ -26,7 +26,6 @@ from crewai.events import (
     crewai_event_bus,
 )
 
-# Load parent root .env if keys not already present
 load_dotenv(override=False)
 parent_env = Path(__file__).resolve().parent.parent.parent.parent / ".env"
 if parent_env.exists():
@@ -41,7 +40,6 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# Enable CORS for React frontend (Vite default is 5173 or 3000)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -187,9 +185,6 @@ def plan_trip_stream(req: TripPlanRequest):
 
         return f"Accommodations Agent for {inputs['destination']}"
 
-    # Async task callbacks must carry an explicit owner. Inferring an agent from
-    # generated text is unreliable: parallel research outputs share terms such
-    # as "hotel", "food", and "itinerary".
     agent_details = {
         "architect": f"Lead Trip Architect for {inputs['destination']}",
         "stay": f"Accommodations Agent for {inputs['destination']}",
@@ -203,9 +198,6 @@ def plan_trip_stream(req: TripPlanRequest):
 
     def format_step_message(step_output) -> str:
         action = step_output[0] if isinstance(step_output, tuple) else step_output
-        # CrewAI has emitted several action shapes across versions. Read both
-        # object attributes and mapping keys so traces do not disappear when a
-        # callback is represented as a dict/tuple instead of AgentAction.
         def field(name: str, *aliases: str):
             names = (name, *aliases)
             if isinstance(action, dict):
@@ -408,15 +400,11 @@ def plan_trip_stream(req: TripPlanRequest):
             for event_type, handler in event_handlers:
                 crewai_event_bus.on(event_type)(handler)
 
-            # Bind callbacks to their concrete task owner. A crew-level callback
-            # has no reliable owner when the first four tasks are concurrent.
             for agent_id, task in zip(task_agent_ids, getattr(crew_instance, "tasks", [])):
                 task.callback = (lambda aid: lambda output: on_task_completed(aid, output))(agent_id)
 
             try:
                 result = crew_instance.kickoff(inputs=inputs)
-                # CrewAI dispatches callbacks on its event executor. Drain those
-                # callbacks before unsubscribing or closing the SSE queue.
                 crewai_event_bus.flush(timeout=30)
             finally:
                 for event_type, handler in event_handlers:
@@ -439,7 +427,6 @@ def plan_trip_stream(req: TripPlanRequest):
         finally:
             event_queue.put(None)  # Sentinel to end stream
 
-    # Launch in background thread so generator can stream immediately
     threading.Thread(target=run_crew, daemon=True).start()
 
     def event_generator():
@@ -484,14 +471,12 @@ def plan_trip(req: TripPlanRequest):
         crew_instance = TravelConciergeCrew().crew()
         result = crew_instance.kickoff(inputs=inputs)
 
-        # CrewAI returns CrewOutput with .pydantic or .json_dict or .raw
         if hasattr(result, "pydantic") and result.pydantic:
             return result.pydantic
         elif hasattr(result, "json_dict") and result.json_dict:
             return CompleteTripItinerary(**result.json_dict)
         elif hasattr(result, "raw") and result.raw:
             try:
-                # Try parsing raw JSON
                 parsed = json.loads(result.raw)
                 return CompleteTripItinerary(**parsed)
             except Exception:

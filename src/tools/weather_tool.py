@@ -10,7 +10,6 @@ def get_destination_weather(city_name: str) -> str:
     Returns temperature range (Celsius and Fahrenheit), rain probabilities, and condition summaries.
     """
     try:
-        # Step 1: Geocode city name to lat/lon via Open-Meteo geocoding API
         geo_url = f"https://geocoding-api.open-meteo.com/v1/search?name={city_name}&count=1&language=en&format=json"
         geo_res = requests.get(geo_url, timeout=10).json()
         
@@ -22,7 +21,6 @@ def get_destination_weather(city_name: str) -> str:
         lon = location["longitude"]
         country = location.get("country", "")
         
-        # Step 2: Fetch forecast
         weather_url = (
             f"https://api.open-meteo.com/v1/forecast?"
             f"latitude={lat}&longitude={lon}&"

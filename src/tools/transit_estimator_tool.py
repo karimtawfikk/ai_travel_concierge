@@ -7,7 +7,6 @@ def _get_place_coordinates(query: str) -> tuple:
     """Helper to geocode a place name to (lat, lon, resolved_name)."""
     headers = {"User-Agent": "AITravelConcierge/1.0 (concierge@travel.ai)"}
     try:
-        # Step 1: Query Wikipedia for geolocated article
         search_url = f"https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch={query}&format=json"
         s_res = requests.get(search_url, headers=headers, timeout=8).json()
         if s_res.get("query", {}).get("search"):
@@ -21,7 +20,6 @@ def _get_place_coordinates(query: str) -> tuple:
         pass
         
     try:
-        # Step 2: Fallback to Open-Meteo geocoder
         geo_url = f"https://geocoding-api.open-meteo.com/v1/search?name={query}&count=1&language=en&format=json"
         geo_res = requests.get(geo_url, timeout=8).json()
         if geo_res.get("results"):

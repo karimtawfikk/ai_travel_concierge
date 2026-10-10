@@ -12,13 +12,12 @@ from .tools.weather_tool import get_destination_weather
 from .tools.currency_tool import convert_currency
 from .tools.transit_estimator_tool import estimate_transit_and_distance
 import litellm
-# Automatically retry rate-limited calls up to 5 times with exponential backoff
+
 litellm.num_retries = 5
 
 
 
 
-# Load local .env first, then parent
 local_env = Path(__file__).resolve().parent.parent / ".env"
 if local_env.exists():
     load_dotenv(local_env, override=True)
@@ -40,7 +39,6 @@ class TravelConciergeCrew:
             raise RuntimeError(
                 "SERPER_API_KEY is required for travel research. Add it to the project .env."
             )
-        # One Serper request per scout, with at most three organic results.
         return SerperDevTool(n_results=3)
 
     @agent
@@ -159,8 +157,6 @@ class TravelConciergeCrew:
         nvidia_budget_llm = LLM(
             model="openai/nvidia/nemotron-3.5-lightning-30b-a3b",
             base_url="https://integrate.api.nvidia.com/v1",
-            # Keep the budget key separate from the synthesis key; fall back to
-            # the existing NVIDIA key until NVIDIA_BUDGET_API_KEY is configured.
             api_key=os.getenv("NVIDIA_BUDGET_API_KEY"),
             temperature=0.1
         )
@@ -175,20 +171,7 @@ class TravelConciergeCrew:
 
     @agent
     def itinerary_compiler(self) -> Agent:
-        """compiler_llm = LLM(
-            model="openai/z-ai/glm-5.3-flash",
-            base_url="https://integrate.api.nvidia.com/v1",
-            api_key=os.getenv("NVIDIA_API_KEY"),
-            temperature=0.1,
-            # The itinerary is a structured response, so spend the token budget
-            # on the JSON instead of Nemotron's default internal reasoning.
-            max_retries=1, 
-            additional_params={
-                "extra_body": {
-                    "chat_template_kwargs": {"enable_thinking": False}
-                }
-            },
-        )"""
+        
         """compiler_llm = LLM(
             model="openai/z-ai/glm-5.3-flash",
             base_url="https://integrate.api.nvidia.com/v1",

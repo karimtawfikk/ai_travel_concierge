@@ -16,7 +16,6 @@ def convert_currency(amount: float, from_currency: str, to_currency: str) -> str
         if from_cur == to_cur:
             return f"No conversion needed: {amount:.2f} {from_cur} is already in {to_cur}."
             
-        # V2 supports a wider currency set, including EGP, than deprecated V1.
         url = f"https://api.frankfurter.dev/v2/rate/{from_cur}/{to_cur}"
         resp = requests.get(url, timeout=10)
         resp.raise_for_status()
