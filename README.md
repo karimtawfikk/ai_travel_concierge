@@ -1,11 +1,11 @@
 # TravelConcierge AI
-> **Autonomous Multi-Agent Travel Architecture** — Orchestrating specialized AI concierges to research, optimize, and build bespoke, interactive travel itineraries in real-time.
+> **Autonomous Multi-Agent Travel Architecture** — Orchestrating specialized AI agents to research, optimize, and build bespoke, interactive travel itineraries in real-time.
 
 ---
 
 ## Overview
 
-**TravelConcierge AI** is a production-grade multi-agent travel planning platform powered by **CrewAI**, **FastAPI**, and **React (Vite)**. Instead of generating generic, single-prompt travel lists, the system deploys a coordinated crew of specialized AI agents running parallel deep research, spatial blueprints, budget validation, and real-time live execution streaming.
+**TravelConcierge AI** is a production-grade multi-agent travel planning platform powered by **CrewAI**, **FastAPI**, and **React (Vite)**. Instead of generating generic, single-prompt travel lists, the system deploys a coordinated crew of specialized AI agents running parallel deep research, budget validation, and real-time live execution streaming.
 
 ---
 
@@ -14,14 +14,8 @@
 ```
                                 [ User Preferences ]
                                          │
-                                         ▼
-                           ┌───────────────────────────┐
-                           │  Spatial Architect Agent  │
-                           │  (Geographic Blueprint)   │
-                           └─────────────┬─────────────┘
-                                         │
                  ┌───────────────────────┼───────────────────────┐
-                 │                       │                       │
+                 │ (Parallel Execution)  │ (Parallel Execution)  │ (Parallel Execution)
                  ▼                       ▼                       ▼
       ┌─────────────────────┐ ┌─────────────────────┐ ┌─────────────────────┐
       │Accommodations Agent │ │  Experiences Agent  │ │    Dining Agent     │
@@ -50,13 +44,12 @@
 ```
 
 ### Specialist Roles:
-1. **Spatial Architect Agent** *(Background Engine)*: Analyzes geographic hubs, optimal clusters, and pacing to prevent zigzag travel.
-2. **Accommodations Agent**: Discovers handpicked boutique hotels, district values, neighborhood safety, and walkability.
-3. **Experiences & Culture Agent**: Curates timed activities, cultural landmarks, hidden gems, and seasonal weather adaptations.
-4. **Dining & Culinary Agent**: Researches authentic culinary hotspots, signature dishes, street food markets, and dietary-tailored restaurants.
-5. **Mobility & Transit Agent**: Calculates airport transfers, rail passes, transit durations, and daily point-to-point logistics.
-6. **Budget & Finance Agent**: Audits total costs across categories, checks exchange rates, and prevents budget overruns.
-7. **Itinerary Synthesis Agent**: Assembles all dossiers into a validated, day-by-day itinerary with exact coordinates and map links.
+1. **Accommodations Agent**: Discovers handpicked boutique hotels, district values, neighborhood safety, and walkability.
+2. **Experiences & Culture Agent**: Curates timed activities, cultural landmarks, hidden gems, and seasonal weather adaptations.
+3. **Dining & Culinary Agent**: Researches authentic culinary hotspots, signature dishes, street food markets, and dietary-tailored restaurants.
+4. **Mobility & Transit Agent**: Calculates airport transfers, rail passes, transit durations, and daily point-to-point logistics.
+5. **Budget & Finance Agent**: Audits total costs across categories, checks exchange rates, and prevents budget overruns.
+6. **Itinerary Synthesis Agent**: Assembles all dossiers into a validated, day-by-day itinerary with exact coordinates and map links.
 
 ---
 
