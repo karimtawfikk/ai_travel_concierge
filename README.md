@@ -79,8 +79,8 @@
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/karimtawfikk/ai_travel_concierge.git
-   cd ai_travel_concierge
+   git clone https://github.com/karimtawfikk/multi-agent-travel-concierge.git
+   cd multi-agent-travel-concierge
    ```
 
 2. **Create and activate a virtual environment**:
