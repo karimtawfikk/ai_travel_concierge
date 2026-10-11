@@ -72,7 +72,6 @@ class TravelConciergeCrew:
         duffel_token = os.getenv("DUFFEL_ACCESS_TOKEN", "").strip()
         env_vars = dict(os.environ)
         env_vars["DUFFEL_API_KEY_LIVE"] = duffel_token
-        env_vars["DUFFEL_ACCESS_TOKEN"] = duffel_token
         mcp_server = MCPServerStdio(
             command=sys.executable,
             args=["-m", "src.flights_mcp_wrapper"],
@@ -199,9 +198,9 @@ class TravelConciergeCrew:
     @agent
     def itinerary_compiler(self) -> Agent:
         compiler_llm = LLM(
-            model="openai/nvidia/nemotron-3.5-lightning-30b-a3b",
-            base_url="https://integrate.api.nvidia.com/v1",
-            api_key=os.getenv("NVIDIA_API_KEY"),
+            model="openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
+            base_url="https://openrouter.ai",
+            api_key=os.getenv("OPENROUTER_API_KEY"),
             temperature=0.1
         )
 
@@ -215,19 +214,18 @@ class TravelConciergeCrew:
         )
 
     @task
-    def flight_search_task(self) -> Task:
-        return Task(
-            config=self.tasks_config["flight_search_task"],
-            agent=self.flight_scout(),
-        )
-
-    @task
     def trip_blueprint_task(self) -> Task:
         return Task(
             config=self.tasks_config["trip_blueprint_task"],
             agent=self.trip_architect(),
-            context=[self.flight_search_task()],
             output_pydantic=TripSpatialBlueprint,
+        )
+
+    @task
+    def flight_search_task(self) -> Task:
+        return Task(
+            config=self.tasks_config["flight_search_task"],
+            agent=self.flight_scout(),
         )
 
     @task
@@ -268,7 +266,6 @@ class TravelConciergeCrew:
             config=self.tasks_config["budget_analysis_task"],
             agent=self.budget_analyst(),
             context=[
-                self.flight_search_task(),
                 self.stay_scout_task(),
                 self.activity_planning_task(),
                 self.food_scout_task(),
