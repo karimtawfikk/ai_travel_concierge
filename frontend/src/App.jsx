@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { 
-  Compass, MapPin, Calendar, CloudSun, Utensils, 
+  Plane, Compass, MapPin, Calendar, CloudSun, Utensils, 
   Hotel, Train, RotateCcw, Clock,
   AlertCircle, Eye, ChevronRight, ChevronDown, PieChart, ExternalLink,
   Activity, CheckCircle2, FileText
@@ -31,6 +31,9 @@ const isValidPrice = (val) => {
 
 const initialEmptyForm = {
   destination: '',
+  origin: '',
+  departure_date: '',
+  return_date: '',
   duration_days: 3,
   travel_style: 'Cultural & Foodie',
   interests: '',
@@ -63,6 +66,9 @@ export default function App() {
         setSelectedDay(0);
         setFormData({
           destination: 'Kyoto, Japan',
+          origin: 'New York (JFK)',
+          departure_date: '2026-11-10',
+          return_date: '2026-11-18',
           duration_days: 3,
           travel_style: 'Cultural & Foodie',
           interests: 'Historic temples, traditional tea houses, vibrant street food, bamboo groves',
@@ -109,7 +115,7 @@ export default function App() {
     setAgentStatus({});
     setCompletedCount(0);
     const completedAgentIds = new Set();
-    const visibleAgentIds = new Set(['stay', 'experience', 'culinary', 'mobility', 'budget', 'compiler']);
+    const visibleAgentIds = new Set(['flight', 'stay', 'experience', 'culinary', 'mobility', 'budget', 'compiler']);
 
     try {
       // Connect to SSE stream
@@ -513,6 +519,69 @@ export default function App() {
                   <div style={{ height: '24px', width: '1px', background: 'rgba(255,255,255,0.1)' }}></div>
                   <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', flex: '1 1 300px' }}>
                     <strong style={{ color: '#cbd5e1' }}>Pack:</strong> {itinerary.weather.packing_recommendations?.join(', ')}
+                  </div>
+                </div>
+              )}
+
+              {/* Round-Trip Flights Dossier Card */}
+              {itinerary.flights && (
+                <div style={{
+                  marginTop: '1.5rem',
+                  padding: '1.25rem 1.5rem',
+                  background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(30, 41, 59, 0.5) 100%)',
+                  borderRadius: '16px',
+                  border: '1px solid rgba(56, 189, 248, 0.25)',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '0.75rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                      <Plane size={22} color="#38bdf8" />
+                      <div>
+                        <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff', margin: 0 }}>
+                          Flight Routes: {itinerary.flights.origin || 'Origin'} ➔ {itinerary.flights.destination || itinerary.destination}
+                        </h4>
+                        <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+                          Dates: {itinerary.flights.departure_date} to {itinerary.flights.return_date || 'Return'} · Researched via Duffel MCP
+                        </span>
+                      </div>
+                    </div>
+                    {itinerary.flights.estimated_total_airfare && (
+                      <div style={{ background: 'rgba(56, 189, 248, 0.15)', border: '1px solid rgba(56, 189, 248, 0.35)', borderRadius: '999px', padding: '0.35rem 0.85rem', color: '#38bdf8', fontSize: '0.82rem', fontWeight: 700 }}>
+                        Airfare: {itinerary.flights.estimated_total_airfare}
+                      </div>
+                    )}
+                  </div>
+
+                  {itinerary.flights.notes && (
+                    <div style={{ fontSize: '0.78rem', color: '#a7b5c9', marginBottom: '0.85rem', fontStyle: 'italic' }}>
+                      💡 {itinerary.flights.notes}
+                    </div>
+                  )}
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
+                    {itinerary.flights.options?.map((opt, oIdx) => (
+                      <div key={oIdx} style={{ background: 'rgba(15, 23, 42, 0.75)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '1rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.65rem' }}>
+                          <strong style={{ fontSize: '0.95rem', color: '#f8fafc' }}>{opt.airline}</strong>
+                          <span style={{ color: '#34d399', fontWeight: 800, fontSize: '0.92rem' }}>{opt.total_price}</span>
+                        </div>
+                        {opt.outbound && (
+                          <div style={{ fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '0.35rem' }}>
+                            <span style={{ color: '#38bdf8', fontWeight: 600 }}>Outbound:</span> {opt.outbound.departure_time} - {opt.outbound.arrival_time} ({opt.outbound.duration || 'Flight'}, {opt.outbound.stops === 0 ? 'Nonstop' : `${opt.outbound.stops} stop`})
+                          </div>
+                        )}
+                        {opt.inbound && (
+                          <div style={{ fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '0.45rem' }}>
+                            <span style={{ color: '#818cf8', fontWeight: 600 }}>Return:</span> {opt.inbound.departure_time} - {opt.inbound.arrival_time} ({opt.inbound.duration || 'Flight'}, {opt.inbound.stops === 0 ? 'Nonstop' : `${opt.inbound.stops} stop`})
+                          </div>
+                        )}
+                        {opt.booking_advice && (
+                          <div style={{ fontSize: '0.75rem', color: '#94a3b8', borderTop: '1px dashed rgba(255,255,255,0.08)', paddingTop: '0.45rem' }}>
+                            {opt.booking_advice}
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}

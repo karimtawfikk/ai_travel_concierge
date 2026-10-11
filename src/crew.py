@@ -1,10 +1,12 @@
-import os
+﻿import os
+import sys
 from pathlib import Path
 from dotenv import load_dotenv
 from pydantic import PrivateAttr
 
 from crewai import Agent, Crew, Process, Task, LLM
 from crewai.project import CrewBase, agent, crew, task
+from crewai.mcp import MCPServerStdio
 from crewai_tools import SerperDevTool
 
 from .models import CompleteTripItinerary, TripSpatialBlueprint
@@ -14,9 +16,6 @@ from .tools.transit_estimator_tool import estimate_transit_and_distance
 import litellm
 
 litellm.num_retries = 5
-
-
-
 
 local_env = Path(__file__).resolve().parent.parent / ".env"
 if local_env.exists():
@@ -28,7 +27,7 @@ if parent_env.exists():
 
 @CrewBase
 class TravelConciergeCrew:
-    """Master AI Travel Concierge Crew with 7 specialized agents and parallel execution"""
+    """Master AI Travel Concierge Crew with specialized agents and MCP flight automation"""
 
     agents_config = "config/agents.yaml"
     tasks_config = "config/tasks.yaml"
@@ -56,6 +55,32 @@ class TravelConciergeCrew:
             tools=[],
             llm=groq_llm_lead,
             max_iter=2,
+            verbose=True,
+            allow_delegation=False,
+        )
+
+    @agent
+    def flight_scout(self) -> Agent:
+        groq_llm_5 = LLM(
+            model="groq/qwen/qwen3.8-27b",
+            temperature=0.1,
+            max_tokens=2000,
+            api_key=os.getenv("GROQ_API_KEY5") or os.getenv("GROQ_API_KEY1"),
+            reasoning_format="hidden",
+            reasoning_effort="low",
+        )
+        duffel_token = os.getenv("DUFFEL_API_KEY_LIVE") or os.getenv("DUFFEL_ACCESS_TOKEN", "")
+        mcp_server = MCPServerStdio(
+            command=sys.executable,
+            args=["-m", "flights.server"],
+            env={"DUFFEL_API_KEY_LIVE": duffel_token},
+        )
+        return Agent(
+            config=self.agents_config["flight_scout"],
+            tools=[],
+            mcps=[mcp_server],
+            llm=groq_llm_5,
+            max_iter=3,
             verbose=True,
             allow_delegation=False,
         )
@@ -171,14 +196,6 @@ class TravelConciergeCrew:
 
     @agent
     def itinerary_compiler(self) -> Agent:
-        
-        """compiler_llm = LLM(
-            model="openai/z-ai/glm-5.3-flash",
-            base_url="https://integrate.api.nvidia.com/v1",
-            api_key=os.getenv("NVIDIA_API_KEY"),
-            temperature=0.1,
-        )"""
-
         compiler_llm = LLM(
             model="openai/nvidia/nemotron-3.5-lightning-30b-a3b",
             base_url="https://integrate.api.nvidia.com/v1",
@@ -201,6 +218,13 @@ class TravelConciergeCrew:
             config=self.tasks_config["trip_blueprint_task"],
             agent=self.trip_architect(),
             output_pydantic=TripSpatialBlueprint,
+        )
+
+    @task
+    def flight_search_task(self) -> Task:
+        return Task(
+            config=self.tasks_config["flight_search_task"],
+            agent=self.flight_scout(),
         )
 
     @task
@@ -241,6 +265,7 @@ class TravelConciergeCrew:
             config=self.tasks_config["budget_analysis_task"],
             agent=self.budget_analyst(),
             context=[
+                self.flight_search_task(),
                 self.stay_scout_task(),
                 self.activity_planning_task(),
                 self.food_scout_task(),
@@ -254,6 +279,7 @@ class TravelConciergeCrew:
             config=self.tasks_config["itinerary_compilation_task"],
             agent=self.itinerary_compiler(),
             context=[
+                self.flight_search_task(),
                 self.stay_scout_task(),
                 self.activity_planning_task(),
                 self.food_scout_task(),

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { 
   MapPin, Calendar, DollarSign, Clock, Sparkles, 
-  RefreshCw, SlidersHorizontal 
+  RefreshCw, SlidersHorizontal, Plane 
 } from 'lucide-react';
 
 export default function TripInputForm({ formData, setFormData, onGenerate, loading }) {
@@ -39,7 +39,7 @@ export default function TripInputForm({ formData, setFormData, onGenerate, loadi
             <span style={{ color: '#38bdf8' }}>Configure Your Custom Journey</span>
           </h2>
           <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', maxWidth: '680px', lineHeight: 1.55 }}>
-            Provide your destination and travel preferences. Our 6 specialized concierges will immediately launch live reconnaissance to construct your personalized itinerary.
+            Provide your destination, departure details, and travel preferences. Our specialized concierges will immediately launch live multi-agent reconnaissance to construct your personalized itinerary.
           </p>
         </div>
 
@@ -84,7 +84,7 @@ export default function TripInputForm({ formData, setFormData, onGenerate, loadi
                 type="text"
                 value={formData.destination}
                 onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
-                placeholder="e.g. Cairo, Egypt or Tokyo, Japan"
+                placeholder="e.g. Kyoto, Japan or Cairo, Egypt"
                 required
                 style={{
                   width: '100%',
@@ -104,10 +104,80 @@ export default function TripInputForm({ formData, setFormData, onGenerate, loadi
             </div>
           </div>
 
+          {/* Departure Airport/City */}
+          <div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.45rem' }}>
+              <Plane size={14} color="#0ea5e9" /> Departure City / Airport
+            </label>
+            <input
+              type="text"
+              value={formData.origin || ''}
+              onChange={(e) => setFormData({ ...formData, origin: e.target.value })}
+              placeholder="e.g. New York (JFK), Cairo (CAI)"
+              style={{
+                width: '100%',
+                padding: '0.8rem 1rem',
+                background: 'rgba(15, 23, 42, 0.9)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                borderRadius: '12px',
+                color: '#fff',
+                fontSize: '0.94rem',
+                fontWeight: 500,
+                outline: 'none',
+              }}
+            />
+          </div>
+
+          {/* Departure Date */}
+          <div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.45rem' }}>
+              <Calendar size={14} color="#38bdf8" /> Start Date
+            </label>
+            <input
+              type="date"
+              value={formData.departure_date || ''}
+              onChange={(e) => setFormData({ ...formData, departure_date: e.target.value })}
+              style={{
+                width: '100%',
+                padding: '0.8rem 1rem',
+                background: 'rgba(15, 23, 42, 0.9)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                borderRadius: '12px',
+                color: '#fff',
+                fontSize: '0.92rem',
+                fontWeight: 500,
+                outline: 'none',
+              }}
+            />
+          </div>
+
+          {/* Return Date */}
+          <div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.45rem' }}>
+              <Calendar size={14} color="#818cf8" /> Return Date
+            </label>
+            <input
+              type="date"
+              value={formData.return_date || ''}
+              onChange={(e) => setFormData({ ...formData, return_date: e.target.value })}
+              style={{
+                width: '100%',
+                padding: '0.8rem 1rem',
+                background: 'rgba(15, 23, 42, 0.9)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                borderRadius: '12px',
+                color: '#fff',
+                fontSize: '0.92rem',
+                fontWeight: 500,
+                outline: 'none',
+              }}
+            />
+          </div>
+
           {/* Duration */}
           <div>
             <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.45rem' }}>
-              <Clock size={14} color="#818cf8" /> Trip Duration
+              <Clock size={14} color="#a855f7" /> Trip Duration
             </label>
             <select
               value={formData.duration_days}
@@ -138,7 +208,7 @@ export default function TripInputForm({ formData, setFormData, onGenerate, loadi
           {/* Budget & Currency */}
           <div>
             <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.45rem' }}>
-              <DollarSign size={14} color="#10b981" /> Target Budget & Currency
+              <DollarSign size={14} color="#10b981" /> Destination Budget (Excl. Flights)
             </label>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               <div style={{ position: 'relative', flexGrow: 1 }}>
@@ -184,30 +254,6 @@ export default function TripInputForm({ formData, setFormData, onGenerate, loadi
                 <option value="EGP">EGP (Egyptian Pound)</option>
               </select>
             </div>
-          </div>
-
-          {/* Dates / Season */}
-          <div>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.45rem' }}>
-              <Calendar size={14} color="#f59e0b" /> Travel Dates / Season
-            </label>
-            <input
-              type="text"
-              value={formData.travel_dates}
-              onChange={(e) => setFormData({ ...formData, travel_dates: e.target.value })}
-              placeholder="e.g. November / Autumn"
-              style={{
-                width: '100%',
-                padding: '0.8rem 1rem',
-                background: 'rgba(15, 23, 42, 0.9)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
-                borderRadius: '12px',
-                color: '#fff',
-                fontSize: '0.92rem',
-                fontWeight: 500,
-                outline: 'none',
-              }}
-            />
           </div>
 
         </div>

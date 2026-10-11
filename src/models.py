@@ -1,4 +1,4 @@
-from typing import List, Optional
+﻿from typing import List, Optional
 from pydantic import BaseModel, Field
 
 
@@ -54,7 +54,7 @@ class StayRecommendation(BaseModel):
 
 
 class BudgetSummary(BaseModel):
-    lodging_total: str = Field(..., description="E.g., '€450 - €600 (~$490 - $650)' or '3,200 EGP (~$65)'. Keep it short and clean (concise price range with currency only)—do NOT include multiplication formulas or long conversion essays.")
+    lodging_total: str = Field(..., description="E.g., '€450 - €600 (~$490 - $650)' or '3,200 EGP (~$65)'. Keep it short and clean.")
     food_total: str = Field(..., description="E.g., '€250 - €350 (~$270 - $380)'. Short, clean price range with currency only.")
     activities_total: str = Field(..., description="E.g., '€120 - €180 (~$130 - $195)'. Short, clean price range with currency only.")
     transit_total: str = Field(..., description="E.g., '€40 - €60 (~$45 - $65)'. Short, clean price range with currency only.")
@@ -70,12 +70,44 @@ class WeatherAdvisory(BaseModel):
     packing_recommendations: List[str] = Field(default_factory=list, description="Recommended clothing items")
 
 
+class FlightLeg(BaseModel):
+    origin: str = Field(..., description="Departure airport or city, e.g., 'JFK' or 'Cairo (CAI)'")
+    destination: str = Field(..., description="Arrival airport or city, e.g., 'KIX' or 'Tokyo (HND)'")
+    date: str = Field(..., description="Date of travel (YYYY-MM-DD)")
+    airline: Optional[str] = Field(None, description="Airline name or carrier, e.g., 'Emirates'")
+    flight_number: Optional[str] = Field(None, description="Flight number, e.g., 'EK 318'")
+    departure_time: Optional[str] = Field(None, description="Departure time, e.g., '10:30 AM'")
+    arrival_time: Optional[str] = Field(None, description="Arrival time, e.g., '08:45 PM'")
+    duration: Optional[str] = Field(None, description="Flight duration, e.g., '11h 45m'")
+    stops: Optional[int] = Field(0, description="Number of layovers (0 for nonstop)")
+
+
+class FlightOption(BaseModel):
+    airline: str = Field(..., description="Primary airline carrier")
+    outbound: Optional[FlightLeg] = Field(None, description="Outbound flight details")
+    inbound: Optional[FlightLeg] = Field(None, description="Return flight details")
+    total_price: str = Field(..., description="Total round-trip price per person with currency, e.g., '$750 USD'")
+    cabin_class: str = Field(default="Economy", description="Cabin class (Economy, Business, etc.)")
+    booking_advice: Optional[str] = Field(None, description="Booking tip or advice on baggage/timing")
+
+
+class FlightRecommendation(BaseModel):
+    origin: str = Field(..., description="User's departure city/airport")
+    destination: str = Field(..., description="Arrival city/airport")
+    departure_date: str = Field(..., description="Start date (YYYY-MM-DD)")
+    return_date: Optional[str] = Field(None, description="Return date (YYYY-MM-DD)")
+    options: List[FlightOption] = Field(default_factory=list, description="Top round-trip flight choices found")
+    estimated_total_airfare: Optional[str] = Field(None, description="Typical price range for the flights, e.g., '$680 - $820 USD'")
+    notes: Optional[str] = Field(None, description="Note explaining airfare is separate from on-the-ground budget")
+
+
 class CompleteTripItinerary(BaseModel):
     trip_title: str = Field(..., description="Catchy, tailored trip title, e.g., 'Tokyo Neon & Temples: 5-Day Odyssey'")
     destination: str = Field(..., description="Destination city/region")
     duration_days: int = Field(..., description="Number of days")
     travel_style: str = Field(..., description="Travel style (e.g., Cultural, Foodie, Adventurous, Relaxed)")
     weather: WeatherAdvisory = Field(..., description="Weather forecast and seasonal notes")
+    flights: Optional[FlightRecommendation] = Field(None, description="Round-trip flight research and options")
     top_stays: List[StayRecommendation] = Field(default_factory=list, description="Lodging recommendations")
     day_plans: List[DayPlan] = Field(default_factory=list, description="Detailed day-by-day plans")
     budget: BudgetSummary = Field(..., description="Comprehensive budget breakdown")

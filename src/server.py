@@ -62,6 +62,9 @@ class TripPlanRequest(BaseModel):
     currency: str = Field(default="USD", example="USD")
     pace: str = Field(default="Balanced", example="Moderate, relaxed")
     travel_dates: Optional[str] = Field(default="Autumn", example="November 2026")
+    origin: Optional[str] = Field(default="", example="New York (JFK)")
+    departure_date: Optional[str] = Field(default="", example="2026-11-15")
+    return_date: Optional[str] = Field(default="", example="2026-11-22")
 
 
 DESTINATION_CURRENCIES = {
@@ -134,6 +137,9 @@ def plan_trip_stream(req: TripPlanRequest):
         "destination_currency": get_destination_currency(req.destination, req.currency or "USD"),
         "pace": req.pace or "Balanced",
         "travel_dates": req.travel_dates.strip() if req.travel_dates and req.travel_dates.strip() else "Upcoming season",
+        "origin": (req.origin or "").strip() if req.origin and req.origin.strip() else "Major Airport",
+        "departure_date": (req.departure_date or "").strip() if req.departure_date and req.departure_date.strip() else (req.travel_dates.strip() if req.travel_dates else "Upcoming season"),
+        "return_date": (req.return_date or "").strip() if req.return_date and req.return_date.strip() else "Flexible return",
     }
 
     def extract_json_data(raw_str: str) -> Optional[dict]:
@@ -165,6 +171,9 @@ def plan_trip_stream(req: TripPlanRequest):
         
         combined = f"{tool} {tool_input} {thought} {text} {output}"
 
+        if any(k in combined for k in ["flight", "airline", "airport", "plane", "round_trip", "departure_date", "duffel", "airfare"]):
+            return "Flight Scout Agent"
+
         if "weather" in tool or any(k in combined for k in ["weather", "landmark", "temple", "sight", "cultural", "activity", "museum", "scenic"]):
             return f"Experiences & Culture Agent for {inputs['destination']}"
         
@@ -187,6 +196,7 @@ def plan_trip_stream(req: TripPlanRequest):
 
     agent_details = {
         "architect": f"Lead Trip Architect for {inputs['destination']}",
+        "flight": "Flight Scout Agent",
         "stay": f"Accommodations Agent for {inputs['destination']}",
         "experience": f"Experiences & Culture Agent for {inputs['destination']}",
         "culinary": f"Dining & Culinary Agent for {inputs['destination']}",
@@ -194,7 +204,7 @@ def plan_trip_stream(req: TripPlanRequest):
         "budget": "Budget & Finance Agent",
         "compiler": "Itinerary Synthesis Agent",
     }
-    task_agent_ids = ("architect", "stay", "experience", "culinary", "mobility", "budget", "compiler")
+    task_agent_ids = ("architect", "flight", "stay", "experience", "culinary", "mobility", "budget", "compiler")
 
     def format_step_message(step_output) -> str:
         action = step_output[0] if isinstance(step_output, tuple) else step_output
@@ -466,6 +476,9 @@ def plan_trip(req: TripPlanRequest):
             "destination_currency": get_destination_currency(req.destination, req.currency or "USD"),
             "pace": req.pace or "Balanced",
             "travel_dates": req.travel_dates.strip() if req.travel_dates and req.travel_dates.strip() else "Upcoming season",
+        "origin": (req.origin or "").strip() if req.origin and req.origin.strip() else "Major Airport",
+        "departure_date": (req.departure_date or "").strip() if req.departure_date and req.departure_date.strip() else (req.travel_dates.strip() if req.travel_dates else "Upcoming season"),
+        "return_date": (req.return_date or "").strip() if req.return_date and req.return_date.strip() else "Flexible return",
         }
 
         crew_instance = TravelConciergeCrew().crew()
