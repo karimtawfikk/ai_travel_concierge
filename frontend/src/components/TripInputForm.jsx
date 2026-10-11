@@ -66,26 +66,36 @@ export default function TripInputForm({ formData, setFormData, onGenerate, loadi
       </div>
 
       <form onSubmit={onGenerate}>
-        {/* Row 1: Core Fields */}
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', 
-          gap: '1.25rem', 
-          marginBottom: '1.5rem' 
+        {/* Flight & Dates Group */}
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.02)',
+          border: '1px solid rgba(56, 189, 248, 0.15)',
+          borderRadius: '16px',
+          padding: '1.25rem 1.5rem',
+          marginBottom: '1.5rem'
         }}>
-          
-          {/* Destination */}
-          <div style={{ gridColumn: 'span 1' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.45rem' }}>
-              <MapPin size={14} color="#38bdf8" /> Destination City <span style={{ color: '#38bdf8' }}>*</span>
-            </label>
-            <div style={{ position: 'relative' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+            <Plane size={16} color="#38bdf8" />
+            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#38bdf8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Travel & Flight Details
+            </span>
+          </div>
+
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+            gap: '1rem',
+          }}>
+            {/* Departure Airport/City */}
+            <div>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.45rem' }}>
+                Departure Airport / City
+              </label>
               <input
                 type="text"
-                value={formData.destination}
-                onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
-                placeholder="e.g. Kyoto, Japan or Cairo, Egypt"
-                required
+                value={formData.origin || ''}
+                onChange={(e) => setFormData({ ...formData, origin: e.target.value })}
+                placeholder="e.g. JFK, CAI, LHR"
                 style={{
                   width: '100%',
                   padding: '0.8rem 1rem',
@@ -96,24 +106,136 @@ export default function TripInputForm({ formData, setFormData, onGenerate, loadi
                   fontSize: '0.94rem',
                   fontWeight: 500,
                   outline: 'none',
-                  transition: 'border-color 0.2s',
                 }}
-                onFocus={(e) => e.target.style.borderColor = '#38bdf8'}
-                onBlur={(e) => e.target.style.borderColor = 'rgba(255, 255, 255, 0.12)'}
+              />
+            </div>
+
+            {/* Flight Type (Round-Trip vs One-Way) */}
+            <div>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.45rem' }}>
+                Route Type
+              </label>
+              <div style={{ display: 'flex', background: 'rgba(15, 23, 42, 0.9)', border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: '12px', padding: '3px', gap: '4px' }}>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, flight_type: 'round_trip' })}
+                  style={{
+                    flex: 1,
+                    padding: '0.6rem 0.5rem',
+                    borderRadius: '9px',
+                    border: 'none',
+                    background: (formData.flight_type || 'round_trip') === 'round_trip' ? 'linear-gradient(135deg, #0284c7, #38bdf8)' : 'transparent',
+                    color: (formData.flight_type || 'round_trip') === 'round_trip' ? '#fff' : 'var(--text-secondary)',
+                    fontWeight: (formData.flight_type || 'round_trip') === 'round_trip' ? 700 : 500,
+                    fontSize: '0.85rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  Round-trip
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, flight_type: 'one_way', return_date: '' })}
+                  style={{
+                    flex: 1,
+                    padding: '0.6rem 0.5rem',
+                    borderRadius: '9px',
+                    border: 'none',
+                    background: formData.flight_type === 'one_way' ? 'linear-gradient(135deg, #0284c7, #38bdf8)' : 'transparent',
+                    color: formData.flight_type === 'one_way' ? '#fff' : 'var(--text-secondary)',
+                    fontWeight: formData.flight_type === 'one_way' ? 700 : 500,
+                    fontSize: '0.85rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  One-way
+                </button>
+              </div>
+            </div>
+
+            {/* Departure Date */}
+            <div>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.45rem' }}>
+                <Calendar size={14} color="#38bdf8" /> Start Date
+              </label>
+              <input
+                type="date"
+                value={formData.departure_date || ''}
+                onChange={(e) => {
+                  setFormData({ ...formData, departure_date: e.target.value });
+                }}
+                style={{
+                  width: '100%',
+                  padding: '0.8rem 1rem',
+                  background: 'rgba(15, 23, 42, 0.9)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  borderRadius: '12px',
+                  color: '#fff',
+                  fontSize: '0.92rem',
+                  fontWeight: 500,
+                  outline: 'none',
+                }}
+              />
+            </div>
+
+            {/* Return Date */}
+            <div>
+              <label style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.35rem', 
+                fontSize: '0.82rem', 
+                fontWeight: 700, 
+                color: formData.flight_type === 'one_way' ? 'rgba(255,255,255,0.3)' : 'var(--text-secondary)', 
+                marginBottom: '0.45rem' 
+              }}>
+                <Calendar size={14} color={formData.flight_type === 'one_way' ? 'rgba(255,255,255,0.3)' : '#818cf8'} /> 
+                Return Date {formData.flight_type === 'one_way' && <span style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 400 }}>(One-Way)</span>}
+              </label>
+              <input
+                type="date"
+                disabled={formData.flight_type === 'one_way'}
+                value={formData.flight_type === 'one_way' ? '' : (formData.return_date || '')}
+                onChange={(e) => {
+                  setFormData({ ...formData, return_date: e.target.value });
+                }}
+                style={{
+                  width: '100%',
+                  padding: '0.8rem 1rem',
+                  background: formData.flight_type === 'one_way' ? 'rgba(15, 23, 42, 0.4)' : 'rgba(15, 23, 42, 0.9)',
+                  border: formData.flight_type === 'one_way' ? '1px dashed rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.12)',
+                  borderRadius: '12px',
+                  color: formData.flight_type === 'one_way' ? 'rgba(255, 255, 255, 0.3)' : '#fff',
+                  fontSize: '0.92rem',
+                  fontWeight: 500,
+                  outline: 'none',
+                  cursor: formData.flight_type === 'one_way' ? 'not-allowed' : 'text',
+                }}
               />
             </div>
           </div>
+        </div>
 
-          {/* Departure Airport/City */}
+        {/* Row 2: Destination, Duration & Budget Group */}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', 
+          gap: '1.25rem', 
+          marginBottom: '1.5rem' 
+        }}>
+          {/* Destination */}
           <div>
             <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.45rem' }}>
-              <Plane size={14} color="#0ea5e9" /> Departure City / Airport
+              <MapPin size={14} color="#38bdf8" /> Destination City <span style={{ color: '#38bdf8' }}>*</span>
             </label>
             <input
               type="text"
-              value={formData.origin || ''}
-              onChange={(e) => setFormData({ ...formData, origin: e.target.value })}
-              placeholder="e.g. New York (JFK), Cairo (CAI)"
+              value={formData.destination}
+              onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
+              placeholder="e.g. Kyoto, Japan or Cairo, Egypt"
+              required
               style={{
                 width: '100%',
                 padding: '0.8rem 1rem',
@@ -128,145 +250,57 @@ export default function TripInputForm({ formData, setFormData, onGenerate, loadi
             />
           </div>
 
-          {/* Flight Type (Round-Trip vs One-Way) */}
-          <div>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.45rem' }}>
-              <Plane size={14} color="#38bdf8" /> Flight Route Type
-            </label>
-            <div style={{ display: 'flex', background: 'rgba(15, 23, 42, 0.9)', border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: '12px', padding: '3px', gap: '4px' }}>
-              <button
-                type="button"
-                onClick={() => setFormData({ ...formData, flight_type: 'round_trip' })}
-                style={{
-                  flex: 1,
-                  padding: '0.6rem 0.5rem',
-                  borderRadius: '9px',
-                  border: 'none',
-                  background: (formData.flight_type || 'round_trip') === 'round_trip' ? 'linear-gradient(135deg, #0284c7, #38bdf8)' : 'transparent',
-                  color: (formData.flight_type || 'round_trip') === 'round_trip' ? '#fff' : 'var(--text-secondary)',
-                  fontWeight: (formData.flight_type || 'round_trip') === 'round_trip' ? 700 : 500,
-                  fontSize: '0.85rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.3rem',
-                }}
-              >
-                Round-trip
-              </button>
-              <button
-                type="button"
-                onClick={() => setFormData({ ...formData, flight_type: 'one_way', return_date: '' })}
-                style={{
-                  flex: 1,
-                  padding: '0.6rem 0.5rem',
-                  borderRadius: '9px',
-                  border: 'none',
-                  background: formData.flight_type === 'one_way' ? 'linear-gradient(135deg, #0284c7, #38bdf8)' : 'transparent',
-                  color: formData.flight_type === 'one_way' ? '#fff' : 'var(--text-secondary)',
-                  fontWeight: formData.flight_type === 'one_way' ? 700 : 500,
-                  fontSize: '0.85rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.3rem',
-                }}
-              >
-                One-way
-              </button>
-            </div>
-          </div>
-
-          {/* Departure Date */}
-          <div>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.45rem' }}>
-              <Calendar size={14} color="#38bdf8" /> Start Date
-            </label>
-            <input
-              type="date"
-              value={formData.departure_date || ''}
-              onChange={(e) => setFormData({ ...formData, departure_date: e.target.value })}
-              style={{
-                width: '100%',
-                padding: '0.8rem 1rem',
-                background: 'rgba(15, 23, 42, 0.9)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
-                borderRadius: '12px',
-                color: '#fff',
-                fontSize: '0.92rem',
-                fontWeight: 500,
-                outline: 'none',
-              }}
-            />
-          </div>
-
-          {/* Return Date */}
-          <div>
-            <label style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '0.35rem', 
-              fontSize: '0.82rem', 
-              fontWeight: 700, 
-              color: formData.flight_type === 'one_way' ? 'rgba(255,255,255,0.3)' : 'var(--text-secondary)', 
-              marginBottom: '0.45rem' 
-            }}>
-              <Calendar size={14} color={formData.flight_type === 'one_way' ? 'rgba(255,255,255,0.3)' : '#818cf8'} /> 
-              Return Date {formData.flight_type === 'one_way' && <span style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 400 }}>(N/A for One-Way)</span>}
-            </label>
-            <input
-              type="date"
-              disabled={formData.flight_type === 'one_way'}
-              value={formData.flight_type === 'one_way' ? '' : (formData.return_date || '')}
-              onChange={(e) => setFormData({ ...formData, return_date: e.target.value })}
-              style={{
-                width: '100%',
-                padding: '0.8rem 1rem',
-                background: formData.flight_type === 'one_way' ? 'rgba(15, 23, 42, 0.4)' : 'rgba(15, 23, 42, 0.9)',
-                border: formData.flight_type === 'one_way' ? '1px dashed rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.12)',
-                borderRadius: '12px',
-                color: formData.flight_type === 'one_way' ? 'rgba(255, 255, 255, 0.3)' : '#fff',
-                fontSize: '0.92rem',
-                fontWeight: 500,
-                outline: 'none',
-                cursor: formData.flight_type === 'one_way' ? 'not-allowed' : 'text',
-              }}
-            />
-          </div>
-
           {/* Duration */}
           <div>
             <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.45rem' }}>
-              <Clock size={14} color="#a855f7" /> Trip Duration
+              <Clock size={14} color="#a855f7" /> Trip Duration (Days)
             </label>
-            <select
-              value={formData.duration_days}
-              onChange={(e) => setFormData({ ...formData, duration_days: parseInt(e.target.value) || 1 })}
-              style={{
-                width: '100%',
-                padding: '0.8rem 1rem',
-                background: 'rgba(15, 23, 42, 0.9)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
-                borderRadius: '12px',
-                color: '#fff',
-                fontSize: '0.92rem',
-                fontWeight: 500,
-                cursor: 'pointer',
-                outline: 'none',
-              }}
-            >
-              <option value={1}>1 Day (Quick Stopover)</option>
-              <option value={2}>2 Days (Weekend Escape)</option>
-              <option value={3}>3 Days (Long Weekend)</option>
-              <option value={4}>4 Days (In-Depth Discovery)</option>
-              <option value={5}>5 Days (Full Exploration)</option>
-              <option value={6}>6 Days (Extended Journey)</option>
-              <option value={7}>7 Days (1 Week Odyssey)</option>
-            </select>
+            {formData.flight_type === 'round_trip' ? (
+              <div
+                style={{
+                  width: '100%',
+                  padding: '0.8rem 1rem',
+                  background: 'rgba(15, 23, 42, 0.5)',
+                  border: '1px dashed rgba(56, 189, 248, 0.35)',
+                  borderRadius: '12px',
+                  color: '#38bdf8',
+                  fontSize: '0.88rem',
+                  fontWeight: 500,
+                  display: 'flex',
+                  alignItems: 'center',
+                  minHeight: '46px',
+                  boxSizing: 'border-box'
+                }}
+              >
+                Calculated from flight schedule
+              </div>
+            ) : (
+              <select
+                value={formData.duration_days}
+                onChange={(e) => {
+                  const newDays = parseInt(e.target.value) || 1;
+                  setFormData({ ...formData, duration_days: newDays });
+                }}
+                style={{
+                  width: '100%',
+                  padding: '0.8rem 1rem',
+                  background: 'rgba(15, 23, 42, 0.9)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  borderRadius: '12px',
+                  color: '#fff',
+                  fontSize: '0.92rem',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  outline: 'none',
+                }}
+              >
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((d) => (
+                  <option key={d} value={d}>
+                    {d} {d === 1 ? 'Day (Stopover)' : 'Days'}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
 
           {/* Budget & Currency */}
@@ -274,36 +308,43 @@ export default function TripInputForm({ formData, setFormData, onGenerate, loadi
             <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.45rem' }}>
               <DollarSign size={14} color="#10b981" /> Destination Budget (Excl. Flights)
             </label>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <div style={{ position: 'relative', flexGrow: 1 }}>
-                <input
-                  type="text"
-                  value={formData.budget}
-                  onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                  placeholder="e.g. 1200"
-                  style={{
-                    width: '100%',
-                    padding: '0.8rem 1rem',
-                    background: 'rgba(15, 23, 42, 0.9)',
-                    border: '1px solid rgba(255, 255, 255, 0.12)',
-                    borderRadius: '12px',
-                    color: '#fff',
-                    fontSize: '0.92rem',
-                    fontWeight: 500,
-                    outline: 'none',
-                  }}
-                />
-              </div>
+            <div style={{ display: 'flex', gap: '0.5rem', width: '100%' }}>
+              <input
+                type="text"
+                value={formData.budget || ''}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setFormData(prev => ({ ...prev, budget: val }));
+                }}
+                placeholder="e.g. 1500"
+                style={{
+                  flex: '1 1 0%',
+                  minWidth: '130px',
+                  padding: '0.8rem 1rem',
+                  background: 'rgba(15, 23, 42, 0.9)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  borderRadius: '12px',
+                  color: '#fff',
+                  fontSize: '0.94rem',
+                  fontWeight: 500,
+                  outline: 'none',
+                  cursor: 'text',
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#10b981'}
+                onBlur={(e) => e.target.style.borderColor = 'rgba(255, 255, 255, 0.15)'}
+              />
               <select
                 value={formData.currency}
-                onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+                onChange={(e) => setFormData(prev => ({ ...prev, currency: e.target.value }))}
                 style={{
-                  padding: '0.8rem 0.9rem',
+                  width: '115px',
+                  flexShrink: 0,
+                  padding: '0.8rem 0.65rem',
                   background: 'rgba(15, 23, 42, 0.9)',
                   border: '1px solid rgba(255, 255, 255, 0.12)',
                   borderRadius: '12px',
                   color: '#fff',
-                  fontSize: '0.9rem',
+                  fontSize: '0.88rem',
                   fontWeight: 600,
                   cursor: 'pointer',
                   outline: 'none',
@@ -315,11 +356,10 @@ export default function TripInputForm({ formData, setFormData, onGenerate, loadi
                 <option value="JPY">JPY (¥)</option>
                 <option value="CAD">CAD ($)</option>
                 <option value="AUD">AUD ($)</option>
-                <option value="EGP">EGP (Egyptian Pound)</option>
+                <option value="EGP">EGP</option>
               </select>
             </div>
           </div>
-
         </div>
 
         {/* Row 2: Advanced Customization */}

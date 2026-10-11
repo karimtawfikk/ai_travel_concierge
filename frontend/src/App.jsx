@@ -3,7 +3,7 @@ import {
   Plane, Compass, MapPin, Calendar, CloudSun, Utensils, 
   Hotel, Train, RotateCcw, Clock,
   AlertCircle, Eye, ChevronRight, ChevronDown, PieChart, ExternalLink,
-  Activity, CheckCircle2, FileText
+  Activity, CheckCircle2, FileText, Printer
 } from 'lucide-react';
 import WelcomeHero from './components/WelcomeHero';
 import AgentPipelineTracker from './components/AgentPipelineTracker';
@@ -431,7 +431,13 @@ export default function App() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
             {/* 1. App Introduction + 6 Autonomous Specialists + Popular Presets */}
             <WelcomeHero onSelectPreset={(preset) => {
-              setFormData(preset);
+              const { duration_days, ...cleanPreset } = preset;
+              setFormData((prev) => ({ 
+                ...prev, 
+                ...cleanPreset, 
+                flight_type: prev.flight_type || 'round_trip',
+                duration_days: prev.duration_days || 3,
+              }));
               const el = document.getElementById('trip-planner-studio');
               if (el) el.scrollIntoView({ behavior: 'smooth' });
             }} />
@@ -473,9 +479,32 @@ export default function App() {
                   </p>
                 </div>
 
-                <div>
+                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={() => window.print()}
+                    className="no-print"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      color: '#fff',
+                      padding: '0.65rem 1.1rem',
+                      borderRadius: '12px',
+                      fontSize: '0.88rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      transition: 'all 0.2s',
+                    }}
+                    title="Export Itinerary as PDF"
+                  >
+                    <Printer size={15} color="#38bdf8" /> Export PDF
+                  </button>
+
                   <button
                     onClick={handleStartFromScratch}
+                    className="no-print"
                     style={{
                       background: 'linear-gradient(135deg, #0284c7 0%, #38bdf8 100%)',
                       border: 'none',

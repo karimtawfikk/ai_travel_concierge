@@ -12,45 +12,64 @@
 ## Multi-Agent Architecture
 
 ```
-                                      [ User Preferences ]
-                                               │
-                 ┌─────────────────────────────┼─────────────────────────────┬─────────────────────────────┐
-                 │ (Parallel Execution)        │ (Parallel Execution)        │ (Parallel Execution)        │ (Parallel Execution)
-                 ▼                             ▼                             ▼                             ▼
-      ┌─────────────────────┐       ┌─────────────────────┐       ┌─────────────────────┐       ┌─────────────────────┐
-      │Accommodations Agent │       │  Experiences Agent  │       │    Dining Agent     │       │Mobility&TransitAgent│
-      │ (Hotels & Districts)│       │ (Culture & Rhythm)  │       │ (Local Gastronomy)  │       │ (Transfers & Passes)│
-      └──────────┬──────────┘       └──────────┬──────────┘       └──────────┬──────────┘       └──────────┬──────────┘
-                 │                             │                             │                             │
-                 └─────────────────────────────┼─────────────────────────────┴─────────────────────────────┘
-                                               │
-                                               ▼
-                                    ┌─────────────────────┐
-                                    │Budget &Finance Agent│
-                                    │(Cost Audit & Safety)│
-                                    └──────────┬──────────┘
-                                               │
-                                               ▼
-                                    ┌─────────────────────┐
-                                    │ Itinerary Synthesis │
-                                    │        Agent        │
-                                    └─────────────────────┘
+                                  [ User Preferences & Travel Dates ]
+                                                   │
+                                                   ▼
+                                      ┌─────────────────────────┐
+                                      │   Flight Scout Agent    │
+                                      │  (Live Duffel MCP Tool) │
+                                      └────────────┬────────────┘
+                                                   │ (Option 1 Anchor Flight)
+                                                   ▼
+                                      ┌─────────────────────────┐
+                                      │   Lead Trip Architect   │
+                                      │ (Spatial Blueprinting)  │
+                                      └────────────┬────────────┘
+                                                   │
+                     ┌─────────────────────────────┼─────────────────────────────┬─────────────────────────────┐
+                     │ (Parallel Exploration)      │ (Parallel Exploration)      │ (Parallel Exploration)      │ (Parallel Exploration)
+                     ▼                             ▼                             ▼                             ▼
+          ┌─────────────────────┐       ┌─────────────────────┐       ┌─────────────────────┐       ┌─────────────────────┐
+          │Accommodations Agent │       │  Experiences Agent  │       │    Dining Agent     │       │Mobility&TransitAgent│
+          │ (Hotels & Districts)│       │ (Culture & 12h AM/PM│       │ (Breakfast/Lunch/   │       │ (Transfers & Passes)│
+          │                     │       │   Timed Activities) │       │   Dinner & Cafes)   │       │                     │
+          └──────────┬──────────┘       └──────────┬──────────┘       └──────────┬──────────┘       └──────────┬──────────┘
+                     │                             │                             │                             │
+                     └─────────────────────────────┼─────────────────────────────┴─────────────────────────────┘
+                                                   │
+                                                   ▼
+                                        ┌─────────────────────┐
+                                        │Budget &Finance Agent│
+                                        │(Cost Audit & Safety)│
+                                        └──────────┬──────────┘
+                                                   │
+                                                   ▼
+                                        ┌─────────────────────┐
+                                        │ Itinerary Synthesis │
+                                        │        Agent        │
+                                        └─────────────────────┘
 ```
 
 ### Specialist Roles:
-1. **Accommodations Agent**: Discovers handpicked boutique hotels, district values, neighborhood safety, and walkability.
-2. **Experiences & Culture Agent**: Curates timed activities, cultural landmarks, hidden gems, and seasonal weather adaptations.
-3. **Dining & Culinary Agent**: Researches authentic culinary hotspots, signature dishes, street food markets, and dietary-tailored restaurants.
-4. **Mobility & Transit Agent**: Calculates airport transfers, rail passes, transit durations, and daily point-to-point logistics.
-5. **Budget & Finance Agent**: Audits total costs across categories, checks exchange rates, and prevents budget overruns.
-6. **Itinerary Synthesis Agent**: Assembles all dossiers into a validated, day-by-day itinerary with exact coordinates and map links.
+1. **Flight Scout Agent**: Directly interrogates the live **Duffel Flight API** via Model Context Protocol (MCP) to discover live airline offers, non-stop flight paths, and airfare quotes, isolating the primary anchor flight.
+2. **Lead Trip Architect**: Ingests flight arrival/departure anchors to calculate true usable exploration days and assigns day-by-day geographic district anchors to prevent transit exhaustion.
+3. **Accommodations Agent**: Discovers handpicked boutique hotels, district values, neighborhood safety, and walkability within the Architect's base neighborhoods.
+4. **Experiences & Culture Agent**: Curates timed activities in 12-hour AM/PM format, cultural landmarks, hidden gems, and seasonal weather adaptations.
+5. **Dining & Culinary Agent**: Researches authentic culinary hotspots ensuring Breakfast, Lunch, and Dinner (plus optional cafes/snacks) match each day's activity district.
+6. **Mobility & Transit Agent**: Calculates airport transfers, rail passes, transit durations, and daily point-to-point logistics.
+7. **Budget & Finance Agent**: Audits total on-the-ground spending across lodging, dining, activities, and transit against the traveler's stated budget.
+8. **Itinerary Synthesis Agent**: Assembles all dossiers into a validated day-by-day timeline with 12-hour AM/PM schedules, flight cutoff rules, and interactive Google Maps links.
 
 ---
 
 ## Key Features
 
-- **Parallel Agent Execution**: Specialized agents run simultaneously for rapid multi-domain reconnaissance.
+- **8-Agent Coordinated Pipeline**: Sequential anchor discovery (Flights ➔ Spatial Blueprint) followed by parallel multi-domain reconnaissance.
+- **Model Context Protocol (MCP) Duffel Flight Search**: Live airline API integration wrapped in MCP stdio for real-time airfare and schedule retrieval.
+- **Dynamic Usable Duration Computation**: Automatically derives activity duration from flight landing and departure times for round-trip flights.
 - **Live SSE Trace Streaming**: Watch the agents research, call tools, and communicate in real-time via Server-Sent Events.
+- **12-Hour AM/PM Synchronized Timelines**: Natural scheduling with arrival pacing, airport transfer deadlines, and complete daily meals (Breakfast, Lunch, Dinner).
+- **One-Click PDF Export**: Direct print-optimized stylesheet for exporting clean, publication-ready travel itineraries.
 - **Grounded Real-Time Tools**: Integrated Serper web search, live destination weather lookups, currency conversion, and transit estimators.
 - **Glassmorphic Modern Frontend**: Dark-mode UI built with React, Lucide Icons, interactive day tabs, and Google Maps integration.
 
@@ -59,9 +78,10 @@
 ## Tech Stack
 
 - **Backend**: Python 3.11+, FastAPI, Uvicorn, CrewAI, LiteLLM, Pydantic v2
-- **LLM Engine**: Groq (Qwen / Llama models), OpenRouter, NVIDIA NIM
-- **Tools & APIs**: SerperDev (Google Search API), Open-Meteo, ExchangeRate API
-- **Frontend**: React 18, Vite, Lucide React, Modern CSS3 Glassmorphism
+- **Agent Protocol**: Model Context Protocol (MCP) with `flights_mcp_wrapper` for live Duffel API search
+- **LLM Engine**: Groq (Qwen 2.5 / Llama 3 models), NVIDIA NIM, OpenRouter
+- **Tools & APIs**: Duffel Flight API, SerperDev (Google Search API), Open-Meteo, ExchangeRate API
+- **Frontend**: React 18, Vite, Lucide React, Print-optimized CSS3 Glassmorphism
 
 ---
 

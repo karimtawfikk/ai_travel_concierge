@@ -11,12 +11,13 @@ class DaySpatialAnchor(BaseModel):
 
 class TripSpatialBlueprint(BaseModel):
     destination: str = Field(..., description="Destination city/region")
+    duration_days: int = Field(..., description="The calculated usable activity days for the trip")
     recommended_stay_neighborhoods: List[str] = Field(..., description="Top 1-2 strategic central base neighborhoods to stay in")
     daily_anchors: List[DaySpatialAnchor] = Field(..., description="Day-by-day geographic district anchors for all scout agents to coordinate around")
 
 
 class ActivityItem(BaseModel):
-    time_slot: str = Field(..., description="E.g., 'Morning (09:30 - 12:00)', 'Afternoon (14:00 - 17:00)'")
+    time_slot: str = Field(..., description="Time window in 12-hour AM/PM format, e.g., 'Morning (09:30 AM - 12:00 PM)', 'Afternoon (02:00 PM - 05:00 PM)', 'Evening (07:00 PM - 09:30 PM)'")
     title: str = Field(..., description="Name of activity or landmark")
     description: str = Field(..., description="Short engaging description of what to do and see")
     location_name: str = Field(..., description="Place name")
@@ -41,7 +42,7 @@ class DayPlan(BaseModel):
     theme: str = Field(..., description="Theme of the day, e.g., 'Art, Cathedrals & Seine Sunset'")
     neighborhood_focus: str = Field(..., description="Primary district or area explored")
     activities: List[ActivityItem] = Field(default_factory=list, description="List of scheduled activities")
-    dining: List[DiningItem] = Field(default_factory=list, description="Recommended dining for the day")
+    dining: List[DiningItem] = Field(default_factory=list, description="Recommended dining for the day. MUST include Breakfast, Lunch, and Dinner, with an optional Snack/Cafe.")
     transit_notes: str = Field(..., description="Transit advice between locations for this specific day")
 
 
@@ -76,8 +77,8 @@ class FlightLeg(BaseModel):
     date: str = Field(..., description="Date of travel (YYYY-MM-DD)")
     airline: Optional[str] = Field(None, description="Airline name or carrier, e.g., 'Emirates'")
     flight_number: Optional[str] = Field(None, description="Flight number, e.g., 'EK 318'")
-    departure_time: Optional[str] = Field(None, description="Departure time, e.g., '10:30 AM'")
-    arrival_time: Optional[str] = Field(None, description="Arrival time, e.g., '08:45 PM'")
+    departure_time: Optional[str] = Field(None, description="Departure time in 12-hour format, e.g., '07:21 PM' or '10:30 AM'")
+    arrival_time: Optional[str] = Field(None, description="Arrival time in 12-hour format, e.g., '02:57 PM' or '05:03 AM'")
     duration: Optional[str] = Field(None, description="Flight duration, e.g., '11h 45m'")
     stops: Optional[int] = Field(0, description="Number of layovers (0 for nonstop)")
 

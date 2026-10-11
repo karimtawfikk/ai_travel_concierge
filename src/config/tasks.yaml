@@ -4,13 +4,17 @@
 
 trip_blueprint_task:
   description: >
-    Analyze {destination} for a {duration_days}-day trip tailored to {travel_style}, {interests}, and {pace}.
+    Analyze {destination} tailored to {travel_style}, {interests}, and {pace}.
+    Review the findings from the Flight Scout Agent:
+    - If trip type is 'one_way': Set duration_days strictly to the requested duration ({duration_days}) and establish exactly that many daily anchors.
+    - If trip type is 'round_trip': Inspect 'Option 1 (Primary Recommended Anchor Flight)' from the Flight Scout's output. Use Option 1's arrival time on {departure_date} and return departure time on {return_date} to calculate the real number of usable activity days. (For example, if arrival is late evening, Day 1 is an arrival/rest buffer; if return is early morning, the final day has no activity hours).
+      Determine the exact count of exploration days and set duration_days equal to the number of created daily_anchors.
     Establish a high-level spatial blueprint for the journey:
     1. Identify 1-2 strategic central base neighborhoods to anchor the traveler's lodging.
-    2. Assign a distinct geographic district anchor and theme for each day of the {duration_days}-day trip so that daily activities and dining cluster together seamlessly without cross-city transit friction.
+    2. Assign a distinct geographic district anchor and theme for each day of the trip (daily_anchors) matching your calculated duration_days so that daily activities and dining cluster together seamlessly without cross-city transit friction.
     Do NOT recommend specific hotel properties, restaurants, or ticket prices - focus purely on establishing the spatial framework for your specialist team.
   expected_output: >
-    A structured spatial blueprint conforming to TripSpatialBlueprint with recommended base neighborhoods and day-by-day district anchors.
+    A structured spatial blueprint conforming to TripSpatialBlueprint with calculated duration_days, recommended base neighborhoods, and day-by-day district anchors.
 
 flight_search_task:
   description: >
@@ -19,16 +23,19 @@ flight_search_task:
     Return date: {return_date}.
     Trip type: {flight_type} (either 'round_trip' or 'one_way').
     Use the search_flights tool provided by the Duffel MCP server to query live flight offers.
-    Identify top 2-3 flight options including airline name, flight numbers, departure and arrival times, layover count, and airfare.
+    CRITICAL: Execute the search_flights tool exactly ONCE. Do NOT make any additional tool calls or repeat the search. Once the tool returns results, immediately synthesize your final response.
+    Identify top 2-3 flight options including airline name, flight numbers, departure and arrival times in 12-hour AM/PM format (e.g. '07:21 PM', '02:57 PM'), layover count, and airfare.
+    Rank your options clearly, explicitly designating your best overall choice as 'Option 1 (Primary Recommended Anchor Flight)'.
     If {origin} or dates are not provided, provide realistic estimated flight prices and gateway airport options for {destination}.
   expected_output: >
-    A concise flight recommendation summary with origin, destination, trip type ({flight_type}),
-    and top flight options with airline, timings, layovers, and airfare.
+    A concise flight recommendation summary explicitly stating the trip type ({flight_type}), origin, destination,
+    and top flight options with airline, timings in 12-hour AM/PM format (e.g. '07:21 PM' - '02:57 PM'), layovers, and airfare, clearly marking 'Option 1 (Primary Recommended Anchor Flight)'.
+    Do NOT include extra commentary, alternative suggestions, notes, or tips about other unselected flights. 
   async_execution: true
 
 stay_scout_task:
   description: >
-    Review the Lead Architect's spatial blueprint for {destination} ({duration_days} days).
+    Review the Lead Architect's spatial blueprint for {destination} and its calculated duration (blueprint duration_days).
     Recommend accommodation options located within or convenient to the Architect's designated base neighborhoods,
     taking into account the traveler's {travel_style}, budget of {budget} {currency}, and {interests}.
     Choose a minimum of 3 places; prioritize fit and credible detail over filling a quota.
@@ -46,16 +53,17 @@ stay_scout_task:
 
 activity_planning_task:
   description: >
-    Review the Lead Architect's spatial blueprint for {destination} ({duration_days} days).
+    Review the Lead Architect's spatial blueprint for {destination} and its calculated daily anchors (daily_anchors).
+    Trip dates: {travel_dates} (Start: {departure_date}, End: {return_date}).
     Plan experiences shaped by {interests}, {travel_style}, and {pace}, anchoring each day's activities
-    to that day's designated district/neighborhood focus from the blueprint.
+    to that day's designated district/neighborhood focus from the blueprint's daily_anchors.
     Build a realistic day-by-day rhythm and choose activities that fit proximity to prevent transit exhaustion.
     Note that the Dining Agent will search for food within your designated daily district.
     estimate_transit_and_distance is available to verify travel times and distances between consecutive morning and afternoon activities.
     Serper search is available if you need to discover or verify a place or current visitor details;
     include {current_year} in a query when it helps find current information.
-    get_destination_weather is available for current and near-term conditions. Use it when relevant. If dates are beyond
-    the immediate forecast window, provide the destination's typical seasonal climate, realistic expected temperature
+    get_destination_weather is available for destination climate and current/near-term conditions. Align your weather observations, seasonal packing recommendations, and daily activity plans to the specific travel dates ({travel_dates}). If dates are beyond
+    the immediate forecast window, provide the destination's typical seasonal climate for that specific month, realistic expected temperature
     range (e.g. '18°C - 28°C'), and general sky/rain conditions concisely without writing disclaimers about unavailable forecasts.
   expected_output: >
     A realistic, day-by-day activity plan with time blocks, concise descriptions, and source links for
@@ -65,8 +73,9 @@ activity_planning_task:
 food_scout_task:
   description: >
     Review the Lead Architect's spatial blueprint for {destination} ({duration_days} days).
-    Coordinate directly with the daily activity schedule by scouting dining options (breakfast, lunch, dinner, cafe)
-    located inside each day's designated district anchor so travelers eat near their activities.
+    Coordinate directly with the daily activity schedule by scouting dining options for every single day.
+    For each day, you MUST provide recommendations for Breakfast, Lunch, and Dinner, plus an optional Snack/Cafe,
+    located inside each day's designated district anchor so travelers eat near their activities without cross-city travel.
     Respect {dietary_preferences}, budget, and the traveler's preferred style. Favor distinctive local food.
     estimate_transit_and_distance is available to verify walking or taxi distance from the daily activity cluster to dining spots.
     Serper search is available when you need to discover real restaurants or verify current details;
@@ -75,8 +84,8 @@ food_scout_task:
     opening status, or current price. Mark uncertain prices as estimates and provide source links for
     claims supported by search.
   expected_output: >
-    A concise selection of named dining options with meal type, cuisine, rationale, approximate price
-    level, and source links for researched claims.
+    A concise selection of named dining options for every day (covering Breakfast, Lunch, Dinner, and optional Snack/Cafe)
+    with meal type, cuisine, rationale, approximate price level, and source links for researched claims.
   async_execution: true
 
 transit_scout_task:
@@ -118,21 +127,30 @@ budget_analysis_task:
 itinerary_compilation_task:
   description: >
     Synthesize all specialist findings into a coherent itinerary for {destination}, lasting
-    {duration_days} days and reflecting {travel_style}, {interests}, {pace}, and {dietary_preferences}.
+    {duration_days} days during {travel_dates} (Start: {departure_date}, End: {return_date}, Flight Type: {flight_type}) and reflecting {travel_style}, {interests}, {pace}, and {dietary_preferences}.
     Include flight recommendations from the Flight Scout Agent into the flights field.
+    Ensure day-by-day dates and the weather advisory (temperatures, conditions, packing tips) correspond to the exact travel window ({travel_dates}).
     Use the research as evidence, resolve conflicts sensibly, and call out important gaps or uncertainty
     rather than making up facts. Adapt the amount of detail and number of recommendations to the trip;
     there are no fixed activity, stay, or dining quotas. Keep the result concise enough to complete the
     structured output.
     Organize each day into a natural timeline, combine the specialists' advice on stays, dining,
-    transport, weather, and budget, and avoid repeating recommendations unnecessarily. Coordinate
-    activities and dining geographically: group each day's activities into a nearby area or cluster,
+    transport, weather, and budget, and avoid repeating recommendations unnecessarily.
+    CRITICAL TIME & FLIGHT SYNCHRONIZATION:
+    - ALWAYS format ALL time slots, flight departure/arrival times, and schedules in 12-hour AM/PM format (e.g. '09:30 AM - 12:00 PM', '02:30 PM - 05:00 PM', '07:30 PM - 09:30 PM'). Do NOT use 24-hour military time anywhere.
+    - Day 1 (Arrival Day): Check the flight arrival time (e.g. '02:57 PM'). Do NOT schedule morning or afternoon sightseeing before the flight arrives. If the flight arrives in late afternoon or evening, Day 1 must focus on airport transit, hotel check-in, unpacking, and an evening dinner stroll or light rest.
+    - Final Day:
+      * If {flight_type} is 'round_trip': Check the return flight departure time. You MUST conclude daytime activities early, schedule returning to the hotel (to collect luggage and complete check-out), and schedule transit to the airport at least 3 to 3.5 hours before flight departure. NEVER schedule sightseeing or dining during or after the airport transfer.
+      * If {flight_type} is 'one_way': There is NO return flight or flight departure deadline. Do NOT cut off activities early or force artificial airport check-in cutoffs on the final day—plan a full, complete day of activities and dinner.
+    - Stated budget ({budget} {currency}) is strictly for on-the-ground spending and excludes airfare.
+    - Daily Dining Completeness: In every day's dining list, you MUST include distinct items for Breakfast, Lunch, and Dinner (plus an optional Snack/Cafe), situated in that day's activity area.
+    Coordinate activities and dining geographically: group each day's activities into a nearby area or cluster,
     pair meals with places in or near that same cluster, and use a different area on another day when
     that makes the trip more practical. Use specific place names and neighborhoods so the application can create Google Maps search links; do not invent coordinates or URLs.
     Format the airport guide and general mobility advice as short numbered points, each on its own line.
     For the weather advisory field: Always provide a concise, realistic expected temperature range (e.g. '18°C - 28°C (64°F - 82°F)') and condition summary (e.g. 'Warm and sunny with light breeze; cool evenings') based on seasonal climate or live research. NEVER output meta-disclaimers or commentary like 'No date-specific forecast was available' or 'The research did not include a forecast'.
     For the budget fields (lodging_total, food_total, activities_total, transit_total, grand_total): Format each STRICTLY as a clean, concise price range with currency codes (e.g. '€450 - €600 (~$490 - $650)' or '3,200 EGP (~$65)'). NEVER put mathematical calculation steps, multiplication formulas, exchange rate derivations, or parenthetical essays into these fields.
   expected_output: >
-    One structured result matching CompleteTripItinerary. Populate required fields, use empty arrays
+    One structured result matching CompleteTripItinerary. Populate required fields, ensure all time blocks are in 12-hour AM/PM format, ensure Breakfast/Lunch/Dinner are present each day, ensure final day includes return to hotel and airport transit before return flight departure, use empty arrays
     when research does not support a recommendation, label estimates, and do not wrap the result in
     Markdown or a code fence.

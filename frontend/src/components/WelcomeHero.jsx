@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Plane, Hotel, Compass, Utensils, Train, DollarSign, Sparkles, Zap, Search } from 'lucide-react';
 import './TravelCommandCenter.css';
 import './AgentExplain.css';
@@ -14,10 +14,10 @@ const specialists = [
 ];
 
 const presets = [
-  { title: 'Cairo, Egypt', subtitle: 'Culture + street food', destination: 'Cairo, Egypt', origin: 'New York (JFK)', duration_days: 3, travel_style: 'Cultural & Foodie', interests: 'Giza Pyramids, historic Islamic Cairo, Khan el-Khalili bazaar, authentic street food, Nile promenade', budget: '1200', currency: 'USD', pace: 'Balanced', travel_dates: 'November / Autumn', dietary_preferences: 'Halal / Authentic Egyptian', flag: '🇪🇬' },
-  { title: 'Tokyo, Japan', subtitle: 'Neon + temples', destination: 'Tokyo, Japan', origin: 'San Francisco (SFO)', duration_days: 4, travel_style: 'Cultural & Foodie', interests: 'Shinjuku neon alleys, Akihabara tech, historic Asakusa, Tsukiji outer market, omakase sushi', budget: '1800', currency: 'USD', pace: 'Active', travel_dates: 'October / Autumn', dietary_preferences: 'No restrictions', flag: '🇯🇵' },
-  { title: 'Paris, France', subtitle: 'Art + patisseries', destination: 'Paris, France', origin: 'Boston (BOS)', duration_days: 3, travel_style: 'Cultural & Foodie', interests: "Louvre & Musée d'Orsay, Montmartre, Seine cruise, artisan boulangeries", budget: '1600', currency: 'EUR', pace: 'Balanced', travel_dates: 'September / Autumn', dietary_preferences: 'Pescatarian', flag: '🇫🇷' },
-  { title: 'Kyoto, Japan', subtitle: 'Zen + gardens', destination: 'Kyoto, Japan', origin: 'New York (JFK)', duration_days: 3, travel_style: 'Cultural & Foodie', interests: 'Fushimi Inari, Arashiyama bamboo grove, tea ceremonies, Gion', budget: '1300', currency: 'USD', pace: 'Relaxed', travel_dates: 'April / Spring Blossom', dietary_preferences: 'No restrictions', flag: '🇯🇵' },
+  { title: 'Cairo, Egypt', subtitle: 'Culture + street food', destination: 'Cairo, Egypt', origin: 'New York (JFK)', travel_style: 'Cultural & Foodie', interests: 'Giza Pyramids, historic Islamic Cairo, Khan el-Khalili bazaar, authentic street food, Nile promenade', budget: '1200', currency: 'USD', pace: 'Balanced', travel_dates: 'November / Autumn', dietary_preferences: 'Halal / Authentic Egyptian', flag: '🇪🇬' },
+  { title: 'Tokyo, Japan', subtitle: 'Neon + temples', destination: 'Tokyo, Japan', origin: 'San Francisco (SFO)', travel_style: 'Cultural & Foodie', interests: 'Shinjuku neon alleys, Akihabara tech, historic Asakusa, Tsukiji outer market, omakase sushi', budget: '1800', currency: 'USD', pace: 'Active', travel_dates: 'October / Autumn', dietary_preferences: 'No restrictions', flag: '🇯🇵' },
+  { title: 'Paris, France', subtitle: 'Art + patisseries', destination: 'Paris, France', origin: 'Boston (BOS)', travel_style: 'Cultural & Foodie', interests: "Louvre & Musée d'Orsay, Montmartre, Seine cruise, artisan boulangeries", budget: '1600', currency: 'EUR', pace: 'Balanced', travel_dates: 'September / Autumn', dietary_preferences: 'Pescatarian', flag: '🇫🇷' },
+  { title: 'Kyoto, Japan', subtitle: 'Zen + gardens', destination: 'Kyoto, Japan', origin: 'New York (JFK)', travel_style: 'Cultural & Foodie', interests: 'Fushimi Inari, Arashiyama bamboo grove, tea ceremonies, Gion', budget: '1300', currency: 'USD', pace: 'Relaxed', travel_dates: 'April / Spring Blossom', dietary_preferences: 'No restrictions', flag: '🇯🇵' },
 ];
 
 function AgentCircle({ selectedAgent, onSelect }) {

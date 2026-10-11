@@ -1,4 +1,4 @@
-﻿# =============================================================================
+# =============================================================================
 # AI TRAVEL CONCIERGE - AGENTS CONFIGURATION
 # =============================================================================
 
@@ -20,10 +20,10 @@ flight_scout:
     Flight Scout Agent for travel from {origin} to {destination}
   goal: >
     Find optimal {flight_type} flight options from {origin} to {destination} departing on {departure_date}.
-    Use the search_flights tool to query airlines, flight numbers, departure and arrival times, stops, and airfare.
+    Execute the search_flights tool exactly ONCE. Never make redundant or follow-up tool calls.
   backstory: >
-    An expert airfare and flight logistics specialist. You query real-time flight offers to discover
-    convenient flight schedules balancing airfare, travel duration, and airline reliability.
+    An expert airfare and flight logistics specialist. You query real-time flight offers with a single, precise
+    search and immediately formulate convenient flight recommendations balancing airfare, travel duration, and airline reliability.
   verbose: true
 
 stay_scout:

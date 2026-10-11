@@ -2,7 +2,7 @@ import os
 import sys
 import json
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional, Dict, Any
 from dotenv import load_dotenv
@@ -51,7 +51,7 @@ app.add_middleware(
 
 class TripPlanRequest(BaseModel):
     destination: str = Field(..., example="Kyoto, Japan")
-    duration_days: int = Field(default=3, ge=1, le=14, example=3)
+    duration_days: Optional[int] = Field(default=3, ge=1, le=14, example=3)
     travel_style: str = Field(default="Cultural & Foodie", example="Cultural & Foodie")
     interests: str = Field(
         default="Historic temples, traditional tea houses, vibrant street food, bamboo groves",
@@ -97,6 +97,29 @@ def get_destination_currency(destination: str, fallback: str) -> str:
     return fallback.strip().upper()
 
 
+def resolve_trip_dates(dep_date: Optional[str], ret_date: Optional[str], duration_days: int, fallback_dates: Optional[str]) -> tuple[str, str, str]:
+    """
+    Resolves trip dates:
+    - If departure_date is given and return_date is empty, calculates return_date = departure_date + duration_days.
+    - Produces a clear travel_dates string (e.g. '2026-11-15 to 2026-11-19') for weather and scheduling agents.
+    """
+    dep = (dep_date or "").strip()
+    ret = (ret_date or "").strip()
+    
+    if dep:
+        if not ret:
+            try:
+                dt = datetime.strptime(dep, "%Y-%m-%d")
+                ret = (dt + timedelta(days=duration_days)).strftime("%Y-%m-%d")
+            except Exception:
+                ret = ""
+        summary = f"{dep} to {ret}" if ret else dep
+        return dep, (ret or dep), summary
+        
+    fb = (fallback_dates or "").strip() if fallback_dates else "Upcoming season"
+    return fb, fb, fb
+
+
 @app.get("/api/health")
 def health_check():
     return {
@@ -126,6 +149,10 @@ def plan_trip_stream(req: TripPlanRequest):
     """
     event_queue = queue.Queue()
 
+    dep_date, ret_date, travel_dates_summary = resolve_trip_dates(
+        req.departure_date, req.return_date, req.duration_days, req.travel_dates
+    )
+
     inputs = {
         "destination": req.destination.strip(),
         "current_year": datetime.now().year,
@@ -137,10 +164,10 @@ def plan_trip_stream(req: TripPlanRequest):
         "currency": req.currency or "USD",
         "destination_currency": get_destination_currency(req.destination, req.currency or "USD"),
         "pace": req.pace or "Balanced",
-        "travel_dates": req.travel_dates.strip() if req.travel_dates and req.travel_dates.strip() else "Upcoming season",
+        "travel_dates": travel_dates_summary,
         "origin": (req.origin or "").strip() if req.origin and req.origin.strip() else "Major Airport",
-        "departure_date": (req.departure_date or "").strip() if req.departure_date and req.departure_date.strip() else (req.travel_dates.strip() if req.travel_dates else "Upcoming season"),
-        "return_date": (req.return_date or "").strip() if req.return_date and req.return_date.strip() else "Flexible return",
+        "departure_date": dep_date,
+        "return_date": ret_date,
         "flight_type": (req.flight_type or "round_trip").strip(),
     }
 
@@ -206,7 +233,7 @@ def plan_trip_stream(req: TripPlanRequest):
         "budget": "Budget & Finance Agent",
         "compiler": "Itinerary Synthesis Agent",
     }
-    task_agent_ids = ("architect", "flight", "stay", "experience", "culinary", "mobility", "budget", "compiler")
+    task_agent_ids = ("flight", "architect", "stay", "experience", "culinary", "mobility", "budget", "compiler")
 
     def format_step_message(step_output) -> str:
         action = step_output[0] if isinstance(step_output, tuple) else step_output
@@ -435,6 +462,8 @@ def plan_trip_stream(req: TripPlanRequest):
             else:
                 event_queue.put({"type": "error", "message": "Failed to extract structured itinerary"})
         except Exception as exc:
+            import traceback
+            traceback.print_exc()
             event_queue.put({"type": "error", "message": str(exc)})
         finally:
             event_queue.put(None)  # Sentinel to end stream
@@ -466,6 +495,10 @@ def plan_trip(req: TripPlanRequest):
     day-by-day JSON itinerary.
     """
     try:
+        dep_date, ret_date, travel_dates_summary = resolve_trip_dates(
+            req.departure_date, req.return_date, req.duration_days, req.travel_dates
+        )
+
         inputs = {
             "destination": req.destination.strip(),
             "current_year": datetime.now().year,
@@ -477,11 +510,11 @@ def plan_trip(req: TripPlanRequest):
             "currency": req.currency or "USD",
             "destination_currency": get_destination_currency(req.destination, req.currency or "USD"),
             "pace": req.pace or "Balanced",
-            "travel_dates": req.travel_dates.strip() if req.travel_dates and req.travel_dates.strip() else "Upcoming season",
-        "origin": (req.origin or "").strip() if req.origin and req.origin.strip() else "Major Airport",
-        "departure_date": (req.departure_date or "").strip() if req.departure_date and req.departure_date.strip() else (req.travel_dates.strip() if req.travel_dates else "Upcoming season"),
-        "return_date": (req.return_date or "").strip() if req.return_date and req.return_date.strip() else "Flexible return",
-        "flight_type": (req.flight_type or "round_trip").strip(),
+            "travel_dates": travel_dates_summary,
+            "origin": (req.origin or "").strip() if req.origin and req.origin.strip() else "Major Airport",
+            "departure_date": dep_date,
+            "return_date": ret_date,
+            "flight_type": (req.flight_type or "round_trip").strip(),
         }
 
         crew_instance = TravelConciergeCrew().crew()
@@ -797,3 +830,8 @@ def get_sample_itinerary():
         airport_transfer_guide="From Kansai International Airport (KIX), board the JR Haruka Limited Express (approx. 75 minutes direct to Kyoto Station, reserved seat ~3,600 JPY). From Itami Airport (ITM), take the direct airport limousine bus (50 minutes, ~1,340 JPY).",
         general_transit_tips="Kyoto is best navigated via JR and Keihan train lines combined with walking. Avoid city buses during peak afternoon traffic on Shijo street.",
     )
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("src.server:app", host="0.0.0.0", port=8000, reload=True)

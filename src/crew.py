@@ -1,4 +1,4 @@
-﻿import os
+import os
 import sys
 from pathlib import Path
 from dotenv import load_dotenv
@@ -45,8 +45,8 @@ class TravelConciergeCrew:
         groq_llm_lead = LLM(
             model="groq/qwen/qwen3.8-27b",
             temperature=0.1,
-            max_tokens=1000,
-            api_key=os.getenv("GROQ_API_KEY6") or os.getenv("GROQ_API_KEY1"),
+            max_tokens=1500,
+            api_key=os.getenv("GROQ_API_KEY6"),
             reasoning_format="hidden",
             reasoning_effort="low",
         )
@@ -69,17 +69,20 @@ class TravelConciergeCrew:
             reasoning_format="hidden",
             reasoning_effort="low",
         )
-        duffel_token = os.getenv("DUFFEL_ACCESS_TOKEN", "")
+        duffel_token = os.getenv("DUFFEL_ACCESS_TOKEN", "").strip()
+        env_vars = dict(os.environ)
+        env_vars["DUFFEL_API_KEY_LIVE"] = duffel_token
+        env_vars["DUFFEL_ACCESS_TOKEN"] = duffel_token
         mcp_server = MCPServerStdio(
             command=sys.executable,
-            args=["-m", "flights.server"],
-            env={"DUFFEL_API_KEY_LIVE": duffel_token},
+            args=["-m", "src.flights_mcp_wrapper"],
+            env=env_vars,
         )
         return Agent(
             config=self.agents_config["flight_scout"],
             mcps=[mcp_server],
             llm=groq_llm_5,
-            max_iter=4,
+            max_iter=2,
             verbose=True,
             allow_delegation=False,
         )
@@ -212,18 +215,19 @@ class TravelConciergeCrew:
         )
 
     @task
-    def trip_blueprint_task(self) -> Task:
-        return Task(
-            config=self.tasks_config["trip_blueprint_task"],
-            agent=self.trip_architect(),
-            output_pydantic=TripSpatialBlueprint,
-        )
-
-    @task
     def flight_search_task(self) -> Task:
         return Task(
             config=self.tasks_config["flight_search_task"],
             agent=self.flight_scout(),
+        )
+
+    @task
+    def trip_blueprint_task(self) -> Task:
+        return Task(
+            config=self.tasks_config["trip_blueprint_task"],
+            agent=self.trip_architect(),
+            context=[self.flight_search_task()],
+            output_pydantic=TripSpatialBlueprint,
         )
 
     @task
