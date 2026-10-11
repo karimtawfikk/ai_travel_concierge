@@ -19,7 +19,7 @@
                                       │   Flight Scout Agent    │
                                       │  (Live Duffel MCP Tool) │
                                       └────────────┬────────────┘
-                                                   │ (Option 1 Anchor Flight)
+                                                   │
                                                    ▼
                                       ┌─────────────────────────┐
                                       │   Lead Trip Architect   │
@@ -92,6 +92,8 @@
 - **Node.js 18+** & `npm`
 - **Serper API Key** ([serper.dev](https://serper.dev))
 - **Groq API Key** ([console.groq.com](https://console.groq.com))
+- **Duffel API Access Token** ([duffel.com](https://duffel.com))
+- **NVIDIA NIM API Key** ([build.nvidia.com](https://build.nvidia.com))
 
 ---
 
@@ -173,6 +175,7 @@ ai_travel_concierge/
 │   │   ├── currency_tool.py  # Live exchange rate tool
 │   │   └── transit_estimator_tool.py # Point-to-point transit calculations
 │   ├── crew.py               # CrewAI crew definition and agent orchestration
+│   ├── flights_mcp_wrapper.py# Duffel MCP flight search wrapper
 │   ├── models.py             # Pydantic schema for structured output
 │   └── server.py             # FastAPI server with SSE streaming endpoint
 └── frontend/

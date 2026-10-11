@@ -214,18 +214,19 @@ class TravelConciergeCrew:
         )
 
     @task
-    def trip_blueprint_task(self) -> Task:
-        return Task(
-            config=self.tasks_config["trip_blueprint_task"],
-            agent=self.trip_architect(),
-            output_pydantic=TripSpatialBlueprint,
-        )
-
-    @task
     def flight_search_task(self) -> Task:
         return Task(
             config=self.tasks_config["flight_search_task"],
             agent=self.flight_scout(),
+        )
+
+    @task
+    def trip_blueprint_task(self) -> Task:
+        return Task(
+            config=self.tasks_config["trip_blueprint_task"],
+            agent=self.trip_architect(),
+            context=[self.flight_search_task()],
+            output_pydantic=TripSpatialBlueprint,
         )
 
     @task

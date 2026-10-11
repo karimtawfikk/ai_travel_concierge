@@ -38,13 +38,16 @@ stay_scout_task:
     Review the Lead Architect's spatial blueprint for {destination} and its calculated duration (blueprint duration_days).
     Recommend accommodation options located within or convenient to the Architect's designated base neighborhoods,
     taking into account the traveler's {travel_style}, budget of {budget} {currency}, and {interests}.
+    CRITICAL BUDGET RULE: The budget ({budget} {currency}) is the TOTAL on-the-ground trip budget across ALL nights combined, NOT a per-night budget.
+    Lodging must consume approximately 30% to 40% of this total budget (for example, for a $1200 total budget over 3-4 nights, nightly hotel rate must be around $80 to $130 per night).
+    Do NOT recommend expensive luxury hotels that consume the entire trip budget in lodging alone.
+    CRITICAL ACCURACY: Execute search to verify actual, real hotels that exist today. NEVER invent fictional hotels (such as 'Khan El Khalili Hotel'). Choose real, reputable boutique hotels, guesthouses, or established hotels with verifiable addresses.
     Choose a minimum of 3 places; prioritize fit and credible detail over filling a quota.
     Consider conventional full-service and chain hotels alongside independent hotels, boutique properties,
     and other lodging types.
     Serper search is available when you need to discover real properties or check current details;
     include {current_year} in a search query when it helps find up-to-date information.
-    Do not search just to satisfy a prompt. If you use search, distinguish sourced facts from estimates
-    and include the supporting links. Do not invent a property, address, or current price.
+    Do not invent a property, address, or current price.
   expected_output: >
     A concise set of suitable neighborhoods and named stay recommendations, identifying each property's
     type (for example, hotel, boutique hotel, or hostel), with rationale, price estimates where available,
@@ -77,11 +80,13 @@ food_scout_task:
     For each day, you MUST provide recommendations for Breakfast, Lunch, and Dinner, plus an optional Snack/Cafe,
     located inside each day's designated district anchor so travelers eat near their activities without cross-city travel.
     Respect {dietary_preferences}, budget, and the traveler's preferred style. Favor distinctive local food.
+    CRITICAL ACCURACY: Execute search to identify REAL, popular, and verified local restaurants, cafes, and street food institutions.
+    NEVER invent or output generic placeholder venue names like 'Pyramids Restaurant', 'Khan El Khalili Restaurant', or 'Airport Cafe'.
+    Every recommended dining spot MUST be a real, specific venue with a verified name and location (such as Abou Tarek, Felfela Downtown, Zooba, Andrea Mariouteya, Naguib Mahfouz Cafe).
     estimate_transit_and_distance is available to verify walking or taxi distance from the daily activity cluster to dining spots.
     Serper search is available when you need to discover real restaurants or verify current details;
     include {current_year} in a query when it helps find current information.
-    Use it when helpful; do not call it just to satisfy a prompt. Never invent a restaurant, address,
-    opening status, or current price. Mark uncertain prices as estimates and provide source links for
+    Never invent a restaurant, address, opening status, or current price. Mark uncertain prices as estimates and provide source links for
     claims supported by search.
   expected_output: >
     A concise selection of named dining options for every day (covering Breakfast, Lunch, Dinner, and optional Snack/Cafe)
@@ -118,6 +123,7 @@ budget_analysis_task:
     researched/estimated costs in {destination_currency}, mark equivalents as unavailable, and do not
     guess. Set the budget currency field to {destination_currency}.
     Focus your budget analysis strictly on on-the-ground spending (lodging, dining, activities, and local transit). Airfare is scouted independently.
+    CRITICAL BUDGET CEILING: The traveler's budget limit is {budget} {currency}. Ensure the estimated costs are realistic and balanced so the grand total range stays within or strictly aligns with the {budget} {currency} ceiling. Do not inflate lodging or dining to exceed the budget.
     Format each itemized subtotal (lodging, dining, activities, transit, grand total) as a clean, concise price range (e.g. '€450 - €600 (~$490 - $650)' or '3,200 EGP (~$65)'). Do NOT write long math formulas, itemized adult/child multiplication formulas, or rate derivation essays inside the total price strings.
   expected_output: >
     An itemized estimate with destination-currency amounts and, when currencies differ, user-currency
@@ -144,12 +150,15 @@ itinerary_compilation_task:
       * If {flight_type} is 'one_way': There is NO return flight or flight departure deadline. Do NOT cut off activities early or force artificial airport check-in cutoffs on the final day—plan a full, complete day of activities and dinner.
     - Stated budget ({budget} {currency}) is strictly for on-the-ground spending and excludes airfare.
     - Daily Dining Completeness: In every day's dining list, you MUST include distinct items for Breakfast, Lunch, and Dinner (plus an optional Snack/Cafe), situated in that day's activity area.
+    - MEAL & TIMELINE SYNCHRONIZATION:
+      In each day's activities schedule, whenever a lunch, dinner, or cafe time-slot is scheduled, ALWAYS use the EXACT real restaurant name and location from that day's dining list. NEVER generate generic or fictional meal entries in activities (like 'Lunch at Pyramids Restaurant' or 'Lunch at Airport Cafe'). If Day 2 lunch in dining is 'Andrea Mariouteya', the activity schedule must say: 'Lunch at Andrea Mariouteya'.
+    - REAL VENUES ONLY: Every attraction, hotel, and restaurant must be a real, verifiable place. Discard any generic placeholder names.
     Coordinate activities and dining geographically: group each day's activities into a nearby area or cluster,
     pair meals with places in or near that same cluster, and use a different area on another day when
     that makes the trip more practical. Use specific place names and neighborhoods so the application can create Google Maps search links; do not invent coordinates or URLs.
     Format the airport guide and general mobility advice as short numbered points, each on its own line.
-    For the weather advisory field: Always provide a concise, realistic expected temperature range (e.g. '18°C - 28°C (64°F - 82°F)') and condition summary (e.g. 'Warm and sunny with light breeze; cool evenings') based on seasonal climate or live research. NEVER output meta-disclaimers or commentary like 'No date-specific forecast was available' or 'The research did not include a forecast'.
     For the budget fields (lodging_total, food_total, activities_total, transit_total, grand_total): Format each STRICTLY as a clean, concise price range with currency codes (e.g. '€450 - €600 (~$490 - $650)' or '3,200 EGP (~$65)'). NEVER put mathematical calculation steps, multiplication formulas, exchange rate derivations, or parenthetical essays into these fields.
+    - BUDGET ALIGNMENT: Ensure the grand_total in the budget summary strictly approximates and respects the traveler's stated on-the-ground budget ({budget} {currency}). The upper bound of the grand total must not significantly exceed {budget} {currency}, and the within_budget boolean must accurately reflect this alignment.
   expected_output: >
     One structured result matching CompleteTripItinerary. Populate required fields, ensure all time blocks are in 12-hour AM/PM format, ensure Breakfast/Lunch/Dinner are present each day, ensure final day includes return to hotel and airport transit before return flight departure, use empty arrays
     when research does not support a recommendation, label estimates, and do not wrap the result in
