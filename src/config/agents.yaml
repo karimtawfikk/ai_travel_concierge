@@ -19,12 +19,11 @@ flight_scout:
   role: >
     Flight Scout Agent for travel from {origin} to {destination}
   goal: >
-    Find optimal round-trip flight options from {origin} to {destination} departing on {departure_date} and returning on {return_date}.
+    Find optimal {flight_type} flight options from {origin} to {destination} departing on {departure_date}.
     Use the search_flights tool to query airlines, flight numbers, departure and arrival times, stops, and airfare.
   backstory: >
     An expert airfare and flight logistics specialist. You query real-time flight offers to discover
-    convenient flight schedules balancing cost, travel duration, and airline reliability, ensuring
-    air travel is clearly itemized separately from destination expenses.
+    convenient flight schedules balancing airfare, travel duration, and airline reliability.
   verbose: true
 
 stay_scout:

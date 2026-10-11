@@ -1,4 +1,4 @@
-﻿from typing import List, Optional
+from typing import List, Optional
 from pydantic import BaseModel, Field
 
 
@@ -86,7 +86,7 @@ class FlightOption(BaseModel):
     airline: str = Field(..., description="Primary airline carrier")
     outbound: Optional[FlightLeg] = Field(None, description="Outbound flight details")
     inbound: Optional[FlightLeg] = Field(None, description="Return flight details")
-    total_price: str = Field(..., description="Total round-trip price per person with currency, e.g., '$750 USD'")
+    total_price: str = Field(..., description="Total airfare per person with currency, e.g., '$750 USD'")
     cabin_class: str = Field(default="Economy", description="Cabin class (Economy, Business, etc.)")
     booking_advice: Optional[str] = Field(None, description="Booking tip or advice on baggage/timing")
 
@@ -94,11 +94,12 @@ class FlightOption(BaseModel):
 class FlightRecommendation(BaseModel):
     origin: str = Field(..., description="User's departure city/airport")
     destination: str = Field(..., description="Arrival city/airport")
+    flight_type: Optional[str] = Field("round_trip", description="'round_trip' or 'one_way'")
     departure_date: str = Field(..., description="Start date (YYYY-MM-DD)")
     return_date: Optional[str] = Field(None, description="Return date (YYYY-MM-DD)")
-    options: List[FlightOption] = Field(default_factory=list, description="Top round-trip flight choices found")
+    options: List[FlightOption] = Field(default_factory=list, description="Top flight choices found")
     estimated_total_airfare: Optional[str] = Field(None, description="Typical price range for the flights, e.g., '$680 - $820 USD'")
-    notes: Optional[str] = Field(None, description="Note explaining airfare is separate from on-the-ground budget")
+    notes: Optional[str] = Field(None, description="Helpful context on live flight options or booking insights")
 
 
 class CompleteTripItinerary(BaseModel):

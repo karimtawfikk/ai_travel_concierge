@@ -65,6 +65,7 @@ class TripPlanRequest(BaseModel):
     origin: Optional[str] = Field(default="", example="New York (JFK)")
     departure_date: Optional[str] = Field(default="", example="2026-11-15")
     return_date: Optional[str] = Field(default="", example="2026-11-22")
+    flight_type: Optional[str] = Field(default="round_trip", example="round_trip")
 
 
 DESTINATION_CURRENCIES = {
@@ -140,6 +141,7 @@ def plan_trip_stream(req: TripPlanRequest):
         "origin": (req.origin or "").strip() if req.origin and req.origin.strip() else "Major Airport",
         "departure_date": (req.departure_date or "").strip() if req.departure_date and req.departure_date.strip() else (req.travel_dates.strip() if req.travel_dates else "Upcoming season"),
         "return_date": (req.return_date or "").strip() if req.return_date and req.return_date.strip() else "Flexible return",
+        "flight_type": (req.flight_type or "round_trip").strip(),
     }
 
     def extract_json_data(raw_str: str) -> Optional[dict]:
@@ -479,6 +481,7 @@ def plan_trip(req: TripPlanRequest):
         "origin": (req.origin or "").strip() if req.origin and req.origin.strip() else "Major Airport",
         "departure_date": (req.departure_date or "").strip() if req.departure_date and req.departure_date.strip() else (req.travel_dates.strip() if req.travel_dates else "Upcoming season"),
         "return_date": (req.return_date or "").strip() if req.return_date and req.return_date.strip() else "Flexible return",
+        "flight_type": (req.flight_type or "round_trip").strip(),
         }
 
         crew_instance = TravelConciergeCrew().crew()
@@ -521,6 +524,73 @@ def get_sample_itinerary():
                 "Layered wool or fleece cardigan",
                 "Ultra-comfortable slip-on walking shoes for temple visits",
                 "Compact daypack and portable charger",
+            ],
+        },
+        flights={
+            "origin": "New York (JFK)",
+            "destination": "Kansai / Kyoto (KIX)",
+            "flight_type": "round_trip",
+            "departure_date": "2026-11-10",
+            "return_date": "2026-11-18",
+            "estimated_total_airfare": "$895 - $920 USD",
+            "notes": "Queried live flight offers. Japan Airlines and ANA offer top-tier comfort and baggage allowances on transpacific routes.",
+            "options": [
+                {
+                    "airline": "Japan Airlines",
+                    "total_price": "$920 USD",
+                    "cabin_class": "Economy",
+                    "booking_advice": "Includes 2 checked bags and seamless Haneda transfer",
+                    "outbound": {
+                        "origin": "JFK",
+                        "destination": "KIX",
+                        "date": "2026-11-10",
+                        "airline": "Japan Airlines",
+                        "flight_number": "JL 005",
+                        "departure_time": "12:15 PM",
+                        "arrival_time": "04:30 PM (+1)",
+                        "duration": "14h 15m",
+                        "stops": 0,
+                    },
+                    "inbound": {
+                        "origin": "KIX",
+                        "destination": "JFK",
+                        "date": "2026-11-18",
+                        "airline": "Japan Airlines",
+                        "flight_number": "JL 006",
+                        "departure_time": "06:20 PM",
+                        "arrival_time": "06:05 PM",
+                        "duration": "13h 45m",
+                        "stops": 0,
+                    },
+                },
+                {
+                    "airline": "ANA (All Nippon Airways)",
+                    "total_price": "$895 USD",
+                    "cabin_class": "Economy",
+                    "booking_advice": "5-star Skytrax hospitality with complimentary seat selection",
+                    "outbound": {
+                        "origin": "JFK",
+                        "destination": "ITM",
+                        "date": "2026-11-10",
+                        "airline": "ANA",
+                        "flight_number": "NH 109",
+                        "departure_time": "11:00 AM",
+                        "arrival_time": "03:15 PM (+1)",
+                        "duration": "14h 15m",
+                        "stops": 1,
+                    },
+                    "inbound": {
+                        "origin": "ITM",
+                        "destination": "JFK",
+                        "date": "2026-11-18",
+                        "airline": "ANA",
+                        "flight_number": "NH 110",
+                        "departure_time": "04:45 PM",
+                        "arrival_time": "04:30 PM",
+                        "duration": "13h 45m",
+                        "stops": 1,
+                    },
+                },
             ],
         },
         top_stays=[

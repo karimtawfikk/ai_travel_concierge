@@ -65,11 +65,11 @@ class TravelConciergeCrew:
             model="groq/qwen/qwen3.8-27b",
             temperature=0.1,
             max_tokens=2000,
-            api_key=os.getenv("GROQ_API_KEY5") or os.getenv("GROQ_API_KEY1"),
+            api_key=os.getenv("GROQ_API_KEY5"),
             reasoning_format="hidden",
             reasoning_effort="low",
         )
-        duffel_token = os.getenv("DUFFEL_API_KEY_LIVE") or os.getenv("DUFFEL_ACCESS_TOKEN", "")
+        duffel_token = os.getenv("DUFFEL_ACCESS_TOKEN", "")
         mcp_server = MCPServerStdio(
             command=sys.executable,
             args=["-m", "flights.server"],
@@ -77,10 +77,9 @@ class TravelConciergeCrew:
         )
         return Agent(
             config=self.agents_config["flight_scout"],
-            tools=[],
             mcps=[mcp_server],
             llm=groq_llm_5,
-            max_iter=3,
+            max_iter=4,
             verbose=True,
             allow_delegation=False,
         )

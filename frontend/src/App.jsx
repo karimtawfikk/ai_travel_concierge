@@ -34,6 +34,7 @@ const initialEmptyForm = {
   origin: '',
   departure_date: '',
   return_date: '',
+  flight_type: 'round_trip',
   duration_days: 3,
   travel_style: 'Cultural & Foodie',
   interests: '',
@@ -69,6 +70,7 @@ export default function App() {
           origin: 'New York (JFK)',
           departure_date: '2026-11-10',
           return_date: '2026-11-18',
+          flight_type: 'round_trip',
           duration_days: 3,
           travel_style: 'Cultural & Foodie',
           interests: 'Historic temples, traditional tea houses, vibrant street food, bamboo groves',
@@ -537,11 +539,27 @@ export default function App() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                       <Plane size={22} color="#38bdf8" />
                       <div>
-                        <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff', margin: 0 }}>
-                          Flight Routes: {itinerary.flights.origin || 'Origin'} ➔ {itinerary.flights.destination || itinerary.destination}
-                        </h4>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem', flexWrap: 'wrap' }}>
+                          <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff', margin: 0 }}>
+                            Flight Routes: {itinerary.flights.origin || 'Origin'} ➔ {itinerary.flights.destination || itinerary.destination}
+                          </h4>
+                          <span style={{ 
+                            fontSize: '0.72rem', 
+                            padding: '0.15rem 0.55rem', 
+                            borderRadius: '999px', 
+                            background: itinerary.flights.flight_type === 'one_way' ? 'rgba(245, 158, 11, 0.15)' : 'rgba(56, 189, 248, 0.15)',
+                            color: itinerary.flights.flight_type === 'one_way' ? '#f59e0b' : '#38bdf8',
+                            border: `1px solid ${itinerary.flights.flight_type === 'one_way' ? 'rgba(245, 158, 11, 0.35)' : 'rgba(56, 189, 248, 0.35)'}`,
+                            fontWeight: 700 
+                          }}>
+                            {itinerary.flights.flight_type === 'one_way' ? 'One-way' : 'Round-trip'}
+                          </span>
+                        </div>
                         <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
-                          Dates: {itinerary.flights.departure_date} to {itinerary.flights.return_date || 'Return'} · Researched via Duffel MCP
+                          {itinerary.flights.flight_type === 'one_way'
+                            ? `Departure Date: ${itinerary.flights.departure_date} · Live Duffel MCP Search`
+                            : `Dates: ${itinerary.flights.departure_date} to ${itinerary.flights.return_date || 'Return'} · Live Duffel MCP Search`
+                          }
                         </span>
                       </div>
                     </div>
@@ -567,10 +585,10 @@ export default function App() {
                         </div>
                         {opt.outbound && (
                           <div style={{ fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '0.35rem' }}>
-                            <span style={{ color: '#38bdf8', fontWeight: 600 }}>Outbound:</span> {opt.outbound.departure_time} - {opt.outbound.arrival_time} ({opt.outbound.duration || 'Flight'}, {opt.outbound.stops === 0 ? 'Nonstop' : `${opt.outbound.stops} stop`})
+                            <span style={{ color: '#38bdf8', fontWeight: 600 }}>{itinerary.flights.flight_type === 'one_way' ? 'Flight:' : 'Outbound:'}</span> {opt.outbound.departure_time} - {opt.outbound.arrival_time} ({opt.outbound.duration || 'Flight'}, {opt.outbound.stops === 0 ? 'Nonstop' : `${opt.outbound.stops} stop`})
                           </div>
                         )}
-                        {opt.inbound && (
+                        {opt.inbound && itinerary.flights.flight_type !== 'one_way' && (
                           <div style={{ fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '0.45rem' }}>
                             <span style={{ color: '#818cf8', fontWeight: 600 }}>Return:</span> {opt.inbound.departure_time} - {opt.inbound.arrival_time} ({opt.inbound.duration || 'Flight'}, {opt.inbound.stops === 0 ? 'Nonstop' : `${opt.inbound.stops} stop`})
                           </div>

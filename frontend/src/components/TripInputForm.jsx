@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { 
   MapPin, Calendar, DollarSign, Clock, Sparkles, 
   RefreshCw, SlidersHorizontal, Plane 
@@ -128,6 +128,59 @@ export default function TripInputForm({ formData, setFormData, onGenerate, loadi
             />
           </div>
 
+          {/* Flight Type (Round-Trip vs One-Way) */}
+          <div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.45rem' }}>
+              <Plane size={14} color="#38bdf8" /> Flight Route Type
+            </label>
+            <div style={{ display: 'flex', background: 'rgba(15, 23, 42, 0.9)', border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: '12px', padding: '3px', gap: '4px' }}>
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, flight_type: 'round_trip' })}
+                style={{
+                  flex: 1,
+                  padding: '0.6rem 0.5rem',
+                  borderRadius: '9px',
+                  border: 'none',
+                  background: (formData.flight_type || 'round_trip') === 'round_trip' ? 'linear-gradient(135deg, #0284c7, #38bdf8)' : 'transparent',
+                  color: (formData.flight_type || 'round_trip') === 'round_trip' ? '#fff' : 'var(--text-secondary)',
+                  fontWeight: (formData.flight_type || 'round_trip') === 'round_trip' ? 700 : 500,
+                  fontSize: '0.85rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.3rem',
+                }}
+              >
+                Round-trip
+              </button>
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, flight_type: 'one_way', return_date: '' })}
+                style={{
+                  flex: 1,
+                  padding: '0.6rem 0.5rem',
+                  borderRadius: '9px',
+                  border: 'none',
+                  background: formData.flight_type === 'one_way' ? 'linear-gradient(135deg, #0284c7, #38bdf8)' : 'transparent',
+                  color: formData.flight_type === 'one_way' ? '#fff' : 'var(--text-secondary)',
+                  fontWeight: formData.flight_type === 'one_way' ? 700 : 500,
+                  fontSize: '0.85rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.3rem',
+                }}
+              >
+                One-way
+              </button>
+            </div>
+          </div>
+
           {/* Departure Date */}
           <div>
             <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.45rem' }}>
@@ -153,23 +206,34 @@ export default function TripInputForm({ formData, setFormData, onGenerate, loadi
 
           {/* Return Date */}
           <div>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.45rem' }}>
-              <Calendar size={14} color="#818cf8" /> Return Date
+            <label style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '0.35rem', 
+              fontSize: '0.82rem', 
+              fontWeight: 700, 
+              color: formData.flight_type === 'one_way' ? 'rgba(255,255,255,0.3)' : 'var(--text-secondary)', 
+              marginBottom: '0.45rem' 
+            }}>
+              <Calendar size={14} color={formData.flight_type === 'one_way' ? 'rgba(255,255,255,0.3)' : '#818cf8'} /> 
+              Return Date {formData.flight_type === 'one_way' && <span style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 400 }}>(N/A for One-Way)</span>}
             </label>
             <input
               type="date"
-              value={formData.return_date || ''}
+              disabled={formData.flight_type === 'one_way'}
+              value={formData.flight_type === 'one_way' ? '' : (formData.return_date || '')}
               onChange={(e) => setFormData({ ...formData, return_date: e.target.value })}
               style={{
                 width: '100%',
                 padding: '0.8rem 1rem',
-                background: 'rgba(15, 23, 42, 0.9)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
+                background: formData.flight_type === 'one_way' ? 'rgba(15, 23, 42, 0.4)' : 'rgba(15, 23, 42, 0.9)',
+                border: formData.flight_type === 'one_way' ? '1px dashed rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.12)',
                 borderRadius: '12px',
-                color: '#fff',
+                color: formData.flight_type === 'one_way' ? 'rgba(255, 255, 255, 0.3)' : '#fff',
                 fontSize: '0.92rem',
                 fontWeight: 500,
                 outline: 'none',
+                cursor: formData.flight_type === 'one_way' ? 'not-allowed' : 'text',
               }}
             />
           </div>

@@ -1,4 +1,4 @@
-﻿# =============================================================================
+# =============================================================================
 # AI TRAVEL CONCIERGE - TASKS CONFIGURATION
 # =============================================================================
 
@@ -14,16 +14,16 @@ trip_blueprint_task:
 
 flight_search_task:
   description: >
-    Search for round-trip flights from origin {origin} to destination {destination}.
+    Search for {flight_type} flights from origin {origin} to destination {destination}.
     Departure date: {departure_date}.
     Return date: {return_date}.
-    Use the search_flights tool provided by the Duffel MCP server to query live round-trip flight offers.
-    Identify top 2-3 flight options including airline name, flight numbers, departure/arrival times, layover count, and round-trip price.
-    If {origin} or dates are not provided, provide realistic estimated round-trip flight prices and gateway airport options for {destination}.
-    IMPORTANT: Clearly quote airfare as an independent travel cost separate from the traveler's {budget} {currency} on-the-ground spending budget.
+    Trip type: {flight_type} (either 'round_trip' or 'one_way').
+    Use the search_flights tool provided by the Duffel MCP server to query live flight offers.
+    Identify top 2-3 flight options including airline name, flight numbers, departure and arrival times, layover count, and airfare.
+    If {origin} or dates are not provided, provide realistic estimated flight prices and gateway airport options for {destination}.
   expected_output: >
-    A concise flight recommendation summary with origin, destination, departure and return dates,
-    top flight options with airline, timings, layovers, and total round-trip price.
+    A concise flight recommendation summary with origin, destination, trip type ({flight_type}),
+    and top flight options with airline, timings, layovers, and airfare.
   async_execution: true
 
 stay_scout_task:
@@ -108,7 +108,7 @@ budget_analysis_task:
     Skip conversion when currencies match. If the budget is not numeric or conversion fails, still report
     researched/estimated costs in {destination_currency}, mark equivalents as unavailable, and do not
     guess. Set the budget currency field to {destination_currency}.
-    IMPORTANT: Note that flight quotes from the Flight Scout are reported separately from the traveler's stated {budget} and on-the-ground spending total.
+    Focus your budget analysis strictly on on-the-ground spending (lodging, dining, activities, and local transit). Airfare is scouted independently.
     Format each itemized subtotal (lodging, dining, activities, transit, grand total) as a clean, concise price range (e.g. '€450 - €600 (~$490 - $650)' or '3,200 EGP (~$65)'). Do NOT write long math formulas, itemized adult/child multiplication formulas, or rate derivation essays inside the total price strings.
   expected_output: >
     An itemized estimate with destination-currency amounts and, when currencies differ, user-currency
