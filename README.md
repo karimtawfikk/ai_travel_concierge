@@ -68,11 +68,7 @@
 - **Model Context Protocol (MCP) Duffel Flight Search**: Live airline API integration wrapped in MCP stdio for real-time airfare and schedule retrieval.
 - **Dynamic Usable Duration Computation**: Automatically derives activity duration from flight landing and departure times for round-trip flights.
 - **Live SSE Trace Streaming**: Watch the agents research, call tools, and communicate in real-time via Server-Sent Events.
-- **12-Hour AM/PM Synchronized Timelines**: Natural scheduling with arrival pacing, airport transfer deadlines, and complete daily meals (Breakfast, Lunch, Dinner).
-- **One-Click PDF Export**: Direct print-optimized stylesheet for exporting clean, publication-ready travel itineraries.
 - **Grounded Real-Time Tools**: Integrated Serper web search, live destination weather lookups, currency conversion, and transit estimators.
-- **Glassmorphic Modern Frontend**: Dark-mode UI built with React, Lucide Icons, interactive day tabs, and Google Maps integration.
-
 ---
 
 ## Tech Stack
